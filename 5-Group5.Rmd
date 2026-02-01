@@ -32,8 +32,11 @@ knitr::opts_chunk$set(echo = TRUE)
 
   The dataset we use to support our proposal is from the nycflights13 package, which contains information on every flight from New York City in 2013 (link:https://nycflights13.tidyverse.org/). The datasets we focus on are the weather and flight datasets. 
 The flights dataset contains valuable information on factors that contribute to flight delays, including departure and arrival delays, and destinations. These variables are important because they are required to determine delay duration, and we hypothesize that destination popularity can cause delays.
+
   The weather dataset contains valuable information on factors that contribute to flight delays, including temperature, visibility, humidity, and precipitation. We consider these variables essential because temperature can affect delays when the weather is too cold or too hot; visibility is also a significant factor; humidity may also affect flight performance; and precipitation can be analyzed alongside visibility or on its own to determine whether excessive rainfall prevents flights. We will also use the variables year, month, and day, as both datasets include them, to facilitate data organization.
+
   We plan to combine all the data variables we want into a single dataset. We can easily incorporate weather and flight data because both datasets include year, month, and day. We then match the weather variables to the assigned dates and examine the weather for each flight. Together, the flights and weather datasets provide both delay outcomes and relevant environmental factors, making them sufficient for analyzing how weather conditions influence flight delays.
+
   In the dataset, some variables we examine have missing values, which can limit our analysis. To ensure data cleanliness, we will remove rows that lack the required values. For example, if there is a temperature data point missing for one row, we won’t consider that row, as we need to consider all the factors we chose for our data. 
 
 
@@ -79,6 +82,7 @@ Backup plan: We can narrow down our analysis to a smaller set of factors or move
 *[Uber pickups](https://www.kaggle.com/fivethirtyeight/uber-pickups-in-new-york-city)
 * What is the average trip length? What are of NYC uses Uber more frequently? How long does average ride takes?
 * Types of analysis: Temporal, spatial or trip efficiency analysis.
+
 
 
 
