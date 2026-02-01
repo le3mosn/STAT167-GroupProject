@@ -25,13 +25,12 @@ knitr::opts_chunk$set(echo = TRUE)
   Do flight delays occur due to their destination or the origin of the airport?
   
   
-  
-
 
 ## Data Description
 
   The dataset we use to support our proposal is from the nycflights13 package, which contains information on every flight from New York City in 2013 (link:https://nycflights13.tidyverse.org/). The datasets we focus on are the weather and flight datasets. 
-The flights dataset contains valuable information on factors that contribute to flight delays, including departure and arrival delays, and destinations. These variables are important because they are required to determine delay duration, and we hypothesize that destination popularity can cause delays.
+  
+  The flights dataset contains valuable information on factors that contribute to flight delays, including departure and arrival delays, and destinations. These variables are important because they are required to determine delay duration, and we hypothesize that destination popularity can cause delays.
 
   The weather dataset contains valuable information on factors that contribute to flight delays, including temperature, visibility, humidity, and precipitation. We consider these variables essential because temperature can affect delays when the weather is too cold or too hot; visibility is also a significant factor; humidity may also affect flight performance; and precipitation can be analyzed alongside visibility or on its own to determine whether excessive rainfall prevents flights. We will also use the variables year, month, and day, as both datasets include them, to facilitate data organization.
 
@@ -41,24 +40,25 @@ The flights dataset contains valuable information on factors that contribute to 
 
 
 
-
 ## Exploratory Data Analysis (Extra Credit)
 
 - include results from prelim EDA
 - describe what insights EDA has provided for project
 
 
+
 ## Methodology & Analysis Plan
 
-To answer our questions, we will generate various plots to visualize our data and findings. Based on these graphs, we can make analyses and see if they support or contradict our hypothesis of popular vacation destinations, seasonal holidays, and extreme weather conditions highly contributing to flight departure and arrival delays. Because our project is concerned with the issue of flight delays, we will be focusing more on positive values for departure and arrival delay in minutes from the flights dataset in nycflights13. 
+  To answer our questions, we will generate various plots to visualize our data and findings. Based on these graphs, we can make analyses and see if they support or contradict our hypothesis of popular vacation destinations, seasonal holidays, and extreme weather conditions highly contributing to flight departure and arrival delays. Because our project is concerned with the issue of flight delays, we will be focusing more on positive values for departure and arrival delay in minutes from the flights dataset in nycflights13. 
 
-Multiple scatterplots will see if weather variables like humidity, temperature, precipitation, and visibility have strong associations with flight delays. We can put regression lines on these scatterplots to visualize trends. We will create heatmaps to show which regions or destinations display the most amount of delays and their weather patterns by month on a map. 
+  Multiple scatterplots will see if weather variables like humidity, temperature, precipitation, and visibility have strong associations with flight delays. We can put regression lines on these scatterplots to visualize trends. We will create heatmaps to show which regions or destinations display the most amount of delays and their weather patterns by month on a map. 
 
-Line graphs can be made for each month that captures trends in average departure and arrival delays for each day. Some points in the graphs can be marked as holidays like December 25 for Christmas. This will help us see how holidays and vacation times affect flight delays. Multiple line graphs can be merged onto one plot to compare all 12 months with each other. This can get messy, so we can solely focus on specific months like the summer months against the winter months. We can also use line graphs to determine if certain destinations have spikes or drops in flight delays based on days or months. If the data is grouped by month and day intervals for each season (June 20 to September 22 for summer), we can measure which seasons experienced the most flight delays on average.
+  Line graphs can be made for each month that captures trends in average departure and arrival delays for each day. Some points in the graphs can be marked as holidays like December 25 for Christmas. This will help us see how holidays and vacation times affect flight delays. Multiple line graphs can be merged onto one plot to compare all 12 months with each other. This can get messy, so we can solely focus on specific months like the summer months against the winter months. We can also use line graphs to determine if certain destinations have spikes or drops in flight delays based on days or months. If the data is grouped by month and day intervals for each season (June 20 to September 22 for summer), we can measure which seasons experienced the most flight delays on average.
 
-In addition, bar graphs can display which destinations had the most flights and least flights by month and in the entire year. Creating bar graphs for each month helps us judge if certain places are more visited depending on the season. For example, we could expect LAX to be popular in June and July due to the sunny beaches in California. We can also use bar graphs to display the amount of flights departing from the three airports (EWR, JFK, LGA) in NYC. JFK is mostly international flights while LGA is mostly domestic flights. We can guess that JFK would have more flights and possibly would experience more delays. Grouped bar plots comparing average delay times between the three airports across the months would help us test that hypothesis.
+  In addition, bar graphs can display which destinations had the most flights and least flights by month and in the entire year. Creating bar graphs for each month helps us judge if certain places are more visited depending on the season. For example, we could expect LAX to be popular in June and July due to the sunny beaches in California. We can also use bar graphs to display the amount of flights departing from the three airports (EWR, JFK, LGA) in NYC. JFK is mostly international flights while LGA is mostly domestic flights. We can guess that JFK would have more flights and possibly would experience more delays. Grouped bar plots comparing average delay times between the three airports across the months would help us test that hypothesis.
 
-As we work on this project, we plan to meet online or in-person as a group to discuss goals and tasks we want to accomplish by the end of the week. Every member will do their assigned parts by the expected deadlines and communicate if there are any conflicts or other issues. This is so we stay on track and have a manageable workload as everyone has other responsibilities to tend to. It saves us the stress of cramming and finishing things at the last minute. 
+  As we work on this project, we plan to meet online or in-person as a group to discuss goals and tasks we want to accomplish by the end of the week. Every member will do their assigned parts by the expected deadlines and communicate if there are any conflicts or other issues. This is so we stay on track and have a manageable workload as everyone has other responsibilities to tend to. It saves us the stress of cramming and finishing things at the last minute. 
+
 
 
 ## Alternative Strategies & Backup Plans
@@ -82,12 +82,6 @@ Backup plan: We can narrow down our analysis to a smaller set of factors or move
 *[Uber pickups](https://www.kaggle.com/fivethirtyeight/uber-pickups-in-new-york-city)
 * What is the average trip length? What are of NYC uses Uber more frequently? How long does average ride takes?
 * Types of analysis: Temporal, spatial or trip efficiency analysis.
-
-
-
-
-
-
 
 
 
