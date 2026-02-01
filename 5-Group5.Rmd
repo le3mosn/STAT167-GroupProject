@@ -38,7 +38,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Methodology & Analysis Plan
 
 - describe analysis/modeling plan
-- link methods directly to projecct objectives
+- link methods directly to project objectives
 - specify detailed techniques you plan to use (ex: visualization, modeling, evaluation methods)
 - ensure methods are appropriate + thoughtfully chosen (not vague)
 - include realistic work plan + timeline showing project feasibility
@@ -49,6 +49,7 @@ knitr::opts_chunk$set(echo = TRUE)
 - discuss potential pitfalls/challenges you might encounter
 - propose clear alternative strategies + back up plans
 - list 2-3 other ideas you have brainstormed, each with a couple bullet points of details
+
 
 
 
