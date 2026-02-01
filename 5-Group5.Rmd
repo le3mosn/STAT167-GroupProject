@@ -56,9 +56,27 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Alternative Strategies & Backup Plans
 
-- discuss potential pitfalls/challenges you might encounter
-- propose clear alternative strategies + back up plans
+- discuss potential pitfalls/challenges you might encounter and propose clear alternative strategies + back up plans
+1. Incompleteness or inconsistency of data:
+  Our dataset might be incomplete or have missing values, which could limit the scope of our analysis.
+  Backup plan: We cna create proxy variables to approximate the factors of interest. For example, instead of using detailed wether conditions, we cna replace them with binary variable, that will indicate if wheather conditions were good (1) for flight departures or bad (0). On another hand we can try to replace all the missing values and do a thorough data cleaning. 
+2. High correlation of individual factors:
+  There might occur difficulties in isolating individual factors due to high correlation.
+  Backup plan: We can use statistical controls and simplified models to reduce confounding effects. For example, we can compare holiday delays woth non-holiday delays, delays with good weather conditions and delays with bad weather conditions separately.
+3. Extreme broadness of scope:
+The scope of our current dataset might be too wide for us to make accurate analysis.
+Backup plan: We can narrow down our analysis to a smaller set of factors or move the focus onto smaller range of time and etc.
 - list 2-3 other ideas you have brainstormed, each with a couple bullet points of details
+1. Yelp reviews analysis
+* [Yelp dataset](https://www.yelp.com/dataset)
+* Is there any correlation between bad reviews and area codes? Or how likely bad reviews? Or how often reviews include photos and are they mostly bad?
+* Types of analysis: Spatial, classification, probability analysis.
+2. Uber rides analysis
+*[Uber pickups](https://www.kaggle.com/fivethirtyeight/uber-pickups-in-new-york-city)
+* What is the average trip length? What are of NYC uses Uber more frequently? How long does average ride takes?
+* Types of analysis: Temporal, spatial or trip efficiency analysis.
+
+
 
 
 
