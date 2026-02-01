@@ -1,0 +1,54 @@
+---
+title: "Final Project Proposal"
+author: "Vincent Chau, Christie Wong, Jimmy Leng, Arsenii Vasilev"
+date: "2026-02-01"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Problem Statement and Motivation
+
+- define problem & research questions
+- explain why the problem is important and interesting
+- outline specific goals/hypotheses to be addressed
+- key questions you plan to explore
+
+
+
+## Data Description
+
+- identify dataset(s) to be used & cite data source/link
+- highlight variables important to your research questions
+- any data limitations? (ex: missing values)
+- assess data cleanliness (describe cleaning plan)
+- if using multiple datasets, how will you merge/integrate them?
+- justify why the dataset(s) are sufficient to your research questions
+
+
+
+## Exploratory Data Analysis (Extra Credit)
+
+- include results from prelim EDA
+- describe what insights EDA has provided for project
+
+
+## Methodology & Analysis Plan
+
+- describe analysis/modeling plan
+- link methods directly to projecct objectives
+- specify detailed techniques you plan to use (ex: visualization, modeling, evaluation methods)
+- ensure methods are appropriate + thoughtfully chosen (not vague)
+- include realistic work plan + timeline showing project feasibility
+
+
+## Alternative Strategies & Backup Plans
+
+- discuss potential pitfalls/challenges you might encounter
+- propose clear alternative strategies + back up plans
+- list 2-3 other ideas you have brainstormed, each with a couple bullet points of details
+
+
+
