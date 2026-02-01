@@ -12,10 +12,18 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Problem Statement and Motivation
 
 - define problem & research questions
+  How do outside factors delay international flights?
 - explain why the problem is important and interesting
+  The problem is important because international aviation contrivutes trillions of dollars to the GDP of many countires, creating economic growth in their respective countries. Furthermore, many political figures rely on flights to travel from place to place. Having an understandin in why flights may be delayed can help prevent time issues as well as potentially save lives. This topic is interesting because we are discovering potential reasons in what factors are the main factors of delays. If we were to pinpoint specific indicators, we could possibly create predictive models based off these factors to ensure timely flights and imrpove efficiency in the avion industry.   
 - outline specific goals/hypotheses to be addressed
+  Our goals are to clean, 
 - key questions you plan to explore
-
+  How does the weather of particular regions affect flight delays?
+  How do holidays/popular vacation times affect flight delays?
+  Do popular vacation locations mean an increase in flight delays?
+  Do specific weather conditions and seaons delay flights more than others?
+  
+  
 
 
 ## Data Description
@@ -49,6 +57,7 @@ knitr::opts_chunk$set(echo = TRUE)
 - discuss potential pitfalls/challenges you might encounter
 - propose clear alternative strategies + back up plans
 - list 2-3 other ideas you have brainstormed, each with a couple bullet points of details
+
 
 
 
