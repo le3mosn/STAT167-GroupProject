@@ -1,6 +1,6 @@
 ---
 title: "Final Project Proposal"
-author: "Vincent Chau, Christie Wong, Jimmy Leng, Arsenii Vasilev"
+author: "Vincent Chau, Christie Wong, Jimmy Ieng, Arsenii Vasilev"
 date: "2026-02-01"
 output: html_document
 ---
@@ -108,6 +108,7 @@ We have also brainstormed other ideas for our project:
 *[Uber pickups](https://www.kaggle.com/fivethirtyeight/uber-pickups-in-new-york-city)
 * What is the average trip length? What are of NYC uses Uber more frequently? How long does average ride takes?
 * Types of analysis: Temporal, spatial or trip efficiency analysis.
+
 
 
 
