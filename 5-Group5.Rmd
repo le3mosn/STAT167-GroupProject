@@ -63,7 +63,7 @@ summary(flights)
 #summary for the weather dataset in nycflights13
 summary(weather)
 ```
-#There are also missing values in the weather dataset; most of the missing data comes from wind_gust and pressure. For wind gusts, the large number of missing values is likely because winds are mostly steady, and for pressure, the flights are above ground, so sea-level pressure can't be recorded. We can't rely on these variables because they contain many missing values. There are other variables with missing values, but the number is slim to none, likely due to an error that prevented their recording. 
+# There are also missing values in the weather dataset; most of the missing data comes from wind_gust and pressure. For wind gusts, the large number of missing values is likely because winds are mostly steady, and for pressure, the flights are above ground, so sea-level pressure can't be recorded. We can't rely on these variables because they contain many missing values. There are other variables with missing values, but the number is slim to none, likely due to an error that prevented their recording. 
 
 
 
@@ -102,6 +102,7 @@ Backup plan: We can narrow down our analysis to a smaller set of factors or move
 *[Uber pickups](https://www.kaggle.com/fivethirtyeight/uber-pickups-in-new-york-city)
 * What is the average trip length? What are of NYC uses Uber more frequently? How long does average ride takes?
 * Types of analysis: Temporal, spatial or trip efficiency analysis.
+
 
 
 
