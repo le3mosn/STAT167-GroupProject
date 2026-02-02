@@ -11,18 +11,16 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Problem Statement and Motivation
 
-- define problem & research questions
-  How do outside factors delay international flights?
-- explain why the problem is important and interesting
-  The problem is important because international aviation contributes trillions of dollars to the GDP of many countires, creating economic growth. Furthermore, many political figures rely on flights to travel from place to place. Having an understanding in why flights may be delayed can help prevent timimg issues as well as potentially save lives. This topic is interesting because we are discovering potential reasons in what factors are the main factors of delays. If we were to pinpoint specific indicators, we could possibly create predictive models based off these factors to ensure timely flights and improve efficiency in the aviation industry. 
-- outline specific goals/hypotheses to be addressed
-  We hypothesize that a combination of popular vacation destinations along with seasonal holidays and extreme weather conditions are high contributors to flight delays. 
-- key questions you plan to explore
-  How does the weather of particular regions affect flight delays?
-  How do holidays/popular vacation times affect flight delays?
-  Do popular vacation locations mean an increase in flight delays?
-  Do specific weather conditions and seasons delay flights more than others?
-  Do flight delays occur due to their destination or the origin of the airport?
+  Our project attempts to answer the question: "How do outside factors delay international flights?"
+  
+  This problem is important because international aviation contributes trillions of dollars to the GDP of many countries, creating economic growth. Furthermore, many political figures rely on flights to travel from place to place. Having an understanding in why flights may be delayed can help prevent timing issues as well as potentially saving lives. This topic is interesting because we are discovering potential reasons in what factors are the main factors of delays. If we were to pinpoint specific indicators, we could possibly create predictive models based off these factors to ensure timely flights and improve efficiency in the aviation industry. 
+
+  We hypothesize that a combination of popular vacation destinations along with seasonal holidays and extreme weather conditions are high contributors to flight delays. The key questions we plan to explore are of the following:
+* How does the weather of particular regions affect flight delays?
+* How do holidays/popular vacation times affect flight delays?
+* Do popular vacation locations mean an increase in flight delays?
+* Do specific weather conditions and seasons delay flights more than others?
+* Do flight delays occur due to their destination or the origin of the airport?
   
   
 
@@ -55,7 +53,8 @@ library(dplyr)
 #summary for the flights dataset in nycflights13
 summary(flights)
 ```
-# There is a lot of missing data for some of the variables in dep_delay, arr_time, arr_delay, and air_time. It appears that the variables with missing data are most likely due to flight cancellations, and some information can't be collected when flights are not in operation. We must consider that flights are canceled and either determine why they are canceled or exclude them from our project.
+  
+  There is a lot of missing data for some of the variables in dep_delay, arr_time, arr_delay, and air_time. It appears that the variables with missing data are most likely due to flight cancellations, and some information can't be collected when flights are not in operation. We must consider that flights are canceled and either determine why they are canceled or exclude them from our project.
 
 
 
@@ -63,7 +62,8 @@ summary(flights)
 #summary for the weather dataset in nycflights13
 summary(weather)
 ```
-# There are also missing values in the weather dataset; most of the missing data comes from wind_gust and pressure. For wind gusts, the large number of missing values is likely because winds are mostly steady, and for pressure, the flights are above ground, so sea-level pressure can't be recorded. We can't rely on these variables because they contain many missing values. There are other variables with missing values, but the number is slim to none, likely due to an error that prevented their recording. 
+  
+  There are also missing values in the weather dataset; most of the missing data comes from wind_gust and pressure. For wind gusts, the large number of missing values is likely because winds are mostly steady, and for pressure, the flights are above ground, so sea-level pressure can't be recorded. We can't rely on these variables because they contain many missing values. There are other variables with missing values, but the number is slim to none, likely due to an error that prevented their recording. 
 
 
 
@@ -83,21 +83,27 @@ summary(weather)
 
 ## Alternative Strategies & Backup Plans
 
-- discuss potential pitfalls/challenges you might encounter and propose clear alternative strategies + back up plans
+There are a few potential challenges we might encounter, so here are some alternative strategies and back-up plans:
+
 1. Incompleteness or inconsistency of data:
   Our dataset might be incomplete or have missing values, which could limit the scope of our analysis.
-  Backup plan: We cna create proxy variables to approximate the factors of interest. For example, instead of using detailed wether conditions, we cna replace them with binary variable, that will indicate if wheather conditions were good (1) for flight departures or bad (0). On another hand we can try to replace all the missing values and do a thorough data cleaning. 
+  Backup plan: We can create proxy variables to approximate the factors of interest. For example, instead of using detailed weather conditions, we can replace them with binary variable, that will indicate if weather conditions were good (1) for flight departures or bad (0). On another hand we can try to replace all the missing values and do a thorough data cleaning.
+  
 2. High correlation of individual factors:
   There might occur difficulties in isolating individual factors due to high correlation.
-  Backup plan: We can use statistical controls and simplified models to reduce confounding effects. For example, we can compare holiday delays woth non-holiday delays, delays with good weather conditions and delays with bad weather conditions separately.
+  Backup plan: We can use statistical controls and simplified models to reduce confounding effects. For example, we can compare holiday delays with non-holiday delays, delays with good weather conditions and delays with bad weather conditions separately.
+  
 3. Extreme broadness of scope:
-The scope of our current dataset might be too wide for us to make accurate analysis.
-Backup plan: We can narrow down our analysis to a smaller set of factors or move the focus onto smaller range of time and etc.
-- list 2-3 other ideas you have brainstormed, each with a couple bullet points of details
+  The scope of our current dataset might be too wide for us to make accurate analysis.
+  Backup plan: We can narrow down our analysis to a smaller set of factors or move the focus onto smaller range of time and etc.
+
+We have also brainstormed other ideas for our project:
+
 1. Yelp reviews analysis
 * [Yelp dataset](https://www.yelp.com/dataset)
 * Is there any correlation between bad reviews and area codes? Or how likely bad reviews? Or how often reviews include photos and are they mostly bad?
 * Types of analysis: Spatial, classification, probability analysis.
+
 2. Uber rides analysis
 *[Uber pickups](https://www.kaggle.com/fivethirtyeight/uber-pickups-in-new-york-city)
 * What is the average trip length? What are of NYC uses Uber more frequently? How long does average ride takes?
