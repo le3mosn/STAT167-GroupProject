@@ -1,0 +1,83 @@
+---
+title: "Stat 167 project"
+author: "Jimmy Ieng"
+date: "2026-02-01"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+
+
+```{r cars, echo = false}
+# packages needed to run the dataset, remove the # if missing any of the packages
+#install.packages("tidyverse")
+#install.packages("nycflights13")
+#install.packages("dplyr")
+library(nycflights13)
+
+library(tidyverse)
+library(dplyr)
+```
+
+
+
+
+```{r pressure}
+#summary for the flights dataset in nycflights13
+#summary(flights)
+
+```
+# There are many missing data for some of the variables in dep_delay, arr_time, arr_delay, air_time. It seems like the variables that have missing info are most likely because of flight cancellations and some information can't be gathered if not in flight. So we have to consider that flights are canceled and either find why flights are being canceled or we will have to ignore the canceled flights for our project.
+
+
+
+```{r}
+#summary for the weather dataset in nycflights13
+#summary(weather)
+```
+#There are also missing values in the weathers dataset, most of the missing data comes from wind_gust and pressure. For wind gust, the reason there are alots of missing values is probably because winds are mostly steady and for pressure the flights are above ground which mean sea level pressure can't be recorded. We can't rely on these variable due to the fact they are missing alot of values. There are other variables with missing values, but there is slim to none missing values, which is probably due to some error preventing them from recording the data. 
+
+
+
+##Filtering the data
+```{r}
+#filtering flights with the important variables we chose
+Filtered_flights <- flights[, c("year", "month", "day", "dep_delay", "arr_delay", "dest")]
+
+Filtered_flights %>% count(year, month, day) %>% filter(n > 1)
+
+summary(Filtered_flights)
+#view(Filtered_flights)
+
+
+#filtering weather with the important variables we chose
+filtered_weather <- weather[,c(1:6,8,12,14)]
+
+filtered_weather %>% count(year, month, day, hour, origin) %>% filter(n > 1)
+
+summary(filtered_weather)
+#view(filtered_weather)
+
+#combing both filtered datasets
+cleaned_weather_flights <- inner_join(Filtered_flights, filtered_weather, by = c("year", "month", "day"))
+view(cleaned_weather_flights)
+cleaned_weather_flights
+cleaned_weather_flights <- drop_na(cleaned_weather_flights)
+
+cleaned_weather_flights
+
+```
+
+
+Sources:
+NYCflights13
