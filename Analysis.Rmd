@@ -1,0 +1,23 @@
+---
+title: "Analysis"
+output: html_document
+date: "2026-02-22"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load necessary packages
+
+```{r}
+
+```
+
+## Load necessary libraries
+
+```{r}
+
+```
+
+
