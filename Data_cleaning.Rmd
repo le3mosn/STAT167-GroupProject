@@ -52,7 +52,7 @@ library(dplyr)
 ##Filtering the data
 ```{r}
 #filtering flights with the important variables we chose
-Filtered_flights <- flights[, c("year", "month", "day", "dep_delay", "arr_delay", "dest")]
+Filtered_flights <- flights[, c("year", "month", "day", "dep_delay", "arr_delay", "dest", "origin", "time_hour")]
 
 Filtered_flights %>% count(year, month, day) %>% filter(n > 1)
 
@@ -61,15 +61,13 @@ summary(Filtered_flights)
 
 
 #filtering weather with the important variables we chose
-filtered_weather <- weather[,c(1:6,8,12,14)]
-
-filtered_weather %>% count(year, month, day, hour, origin) %>% filter(n > 1)
+filtered_weather <- weather[,c(1,6,8,12,14,15)]
 
 summary(filtered_weather)
 #view(filtered_weather)
 
-#combing both filtered datasets
-cleaned_weather_flights <- inner_join(Filtered_flights, filtered_weather, by = c("year", "month", "day"))
+#combining both filtered datasets by time_hour and origin
+cleaned_weather_flights <- inner_join(Filtered_flights, filtered_weather, by = c("origin", "time_hour"))
 view(cleaned_weather_flights)
 cleaned_weather_flights
 cleaned_weather_flights <- drop_na(cleaned_weather_flights)
