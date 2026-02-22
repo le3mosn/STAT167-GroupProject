@@ -11,7 +11,9 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Load necessary packages
 
 ```{r}
-
+library(nycflights13)
+library(ggplot2)
+library(dplyr)
 ```
 
 ## Load necessary libraries
