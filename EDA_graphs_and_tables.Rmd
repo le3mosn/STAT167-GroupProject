@@ -1,0 +1,84 @@
+---
+title: "Untitled"
+output: html_document
+date: "2026-02-22"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+library(nycflights13)
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(lubridate)
+```
+
+```{r}
+#filtering flights with the important variables we chose
+Filtered_flights <- flights[, c("year", "month", "day", "dep_delay", "arr_delay", "dest", "origin", "time_hour")]
+
+Filtered_flights %>% count(year, month, day) %>% filter(n > 1)
+
+summary(Filtered_flights)
+#view(Filtered_flights)
+
+
+#filtering weather with the important variables we chose
+filtered_weather <- weather[,c(1,6,8,12,14,15)]
+
+summary(filtered_weather)
+#view(filtered_weather)
+
+#combining both filtered datasets by time_hour and origin
+cleaned_weather_flights <- inner_join(Filtered_flights, filtered_weather, by = c("origin", "time_hour"))
+view(cleaned_weather_flights)
+cleaned_weather_flights
+cleaned_weather_flights <- drop_na(cleaned_weather_flights)
+
+```
+
+
+How do holidays/popular vacation times affect delays?
+
+```{r}
+
+# Months with the most departure delays on average
+(month_dep_delay <- cleaned_weather_flights |>
+  group_by(month) |>
+  summarise(avg_dep_delay = mean(dep_delay)) |>
+  arrange(desc(avg_dep_delay)))
+
+# Months with the most arrival delays on average
+(month_arr_delay <- cleaned_weather_flights |>
+  group_by(month) |>
+  summarise(avg_arr_delay = mean(arr_delay)) |>
+  arrange(desc(avg_arr_delay)))
+
+# Top 3 months w/ highest delays: July, June, December
+```
+
+```{r}
+library(gridExtra)
+bar1 <- ggplot(month_dep_delay, aes(x = month, y = avg_dep_delay, fill = "salmon")) +
+  geom_col() +
+  geom_text(aes(label = month), vjust = 1.5) +
+  theme(legend.position = "none")
+
+bar2 <- ggplot(month_arr_delay, aes(x = month, y = avg_arr_delay, fill = avg_arr_delay < 0)) +
+  geom_col() +
+  geom_text(aes(label = month), vjust = 1.5) +
+  theme(legend.position = "none") +
+  ylim(-7, 18)
+
+grid.arrange(bar1, bar2)
+```
+
