@@ -47,7 +47,10 @@ cleaned_weather_flights <- drop_na(cleaned_weather_flights)
 ```
 
 
-How do holidays/popular vacation times affect delays?
+
+
+
+**Q.1** How do holidays/popular vacation times affect delays?
 
 ```{r}
 
@@ -63,7 +66,15 @@ How do holidays/popular vacation times affect delays?
   summarise(avg_arr_delay = mean(arr_delay)) |>
   arrange(desc(avg_arr_delay)))
 
+# Total flights per month
+cleaned_weather_flights |>
+  group_by(month) |>
+  summarise(flight_total = n()) |>
+  arrange(desc(flight_total))
+
 # Top 3 months w/ highest delays: July, June, December
+# Months with the most amount of flights: August, October, July
+# Flights mostly within the 26k - 28.5k range except for February with 23k flights
 ```
 
 ```{r}
@@ -79,6 +90,61 @@ bar2 <- ggplot(month_arr_delay, aes(x = month, y = avg_arr_delay, fill = avg_arr
   theme(legend.position = "none") +
   ylim(-7, 18)
 
-grid.arrange(bar1, bar2)
+grid.arrange(bar1, bar2, ncol = 2)
+```
+
+
+
+
+
+**Q.2** Do popular vacation locations mean an increase in flight delays?
+
+```{r}
+destinations <- cleaned_weather_flights |>
+  group_by(dest) |>
+  summarise(total_flights = n(),
+            avg_arr_delay = mean(arr_delay),
+            avg_dep_delay = mean(dep_delay))
+  
+destinations |> arrange(desc(total_flights))
+# lots of flights going into Atlanta (GA), Chicago (IL) and Los Angeles (LAX) in 2013
+
+destinations |> arrange(desc(avg_arr_delay))
+# most avg arrival delay: CAE, TUL, OKC
+
+destinations |> arrange(desc(avg_dep_delay))
+# most avg dep_delay is: TUL (Oklahoma), CAE (South Carolina), OKC (Oklahoma) 
+
+# ATL - arr: 11.28, dep: 12.41
+# ORD - arr: 5.866, dep: 13.44
+# LAX - arr: 0.525, dep: 9.35
+
+```
+
+
+```{r}
+percent_delay <- cleaned_weather_flights |>
+  group_by(dest) |>
+  summarise(total_flights = n(),
+            total_arr_delayed = sum(arr_delay > 15),
+            total_dep_delayed = sum(dep_delay > 15),
+            percent_arr_delay = total_arr_delayed/total_flights,
+            percent_dep_delay = total_dep_delayed/total_flights)
+
+percent_delay |> arrange(desc(percent_arr_delay))
+# CAE, OKC, TUL
+
+percent_delay |> arrange(desc(percent_dep_delay))
+# JAC, SBN, CAE, TUL, OKC
+# Keep in mind JAC and SBN both have less than 25 flights
+
+# CAE: 63% arrival delay and 48% departure delay
+# OKC: 50% arrival delay and 43% departure delay
+# TUL: 48% arrival delay and 44% departure delay
+
+# Popular airport spots yet they seem to run pretty efficiently
+# ATL: 25% arrival delay and 20% departure delay
+# ORD: 23% arrival delay and 22% departure delay
+# LAX: 20% arrival delay and 17% departure delay
 ```
 
