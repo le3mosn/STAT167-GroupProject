@@ -148,3 +148,138 @@ percent_delay |> arrange(desc(percent_dep_delay))
 # LAX: 20% arrival delay and 17% departure delay
 ```
 
+
+**Q.3** Do specific weather conditions and seasons delay flights more than others?
+```{r}
+#Checking percentage of flights by Seasons
+#grouping months into seasons
+flights_season <- cleaned_weather_flights %>%
+  mutate(season = case_when(
+    month %in% c(12, 1, 2) ~ "Winter",
+    month %in% c(3, 4, 5) ~ "Spring",
+    month %in% c(6, 7, 8) ~ "Summer",
+    month %in% c(9, 10, 11) ~ "Fall"
+  ))
+
+flights_season
+
+Percent_delay_by_Seasons <- flights_season %>% 
+  group_by(season) %>%
+  summarise(total_flights = n(),
+            total_arr_delayed = sum(arr_delay > 15),
+            total_dep_delayed = sum(dep_delay > 15),
+            percent_arr_delay = total_arr_delayed/total_flights,
+            percent_dep_delay = total_dep_delayed/total_flights)
+
+Percent_delay_by_Seasons
+
+
+#Spring: 24.2% Arrival Delay and 22.4% Departure Delay
+#Summer: 28.6% Arrival Delay and 26.6% Departure Delay
+#Winter: 26.2% Arrival Delay and 22.2% Departure Delay
+#Fall: 15.7% Arrival Delay and 14.7% Departure Delay
+```
+
+```{r}
+#Checking percentage of flights by rain 
+
+#Delays by rain
+# groups precipitation by 0.3 inch of rain
+flights_rain <- cleaned_weather_flights %>%
+  mutate(
+    precip_bin = cut(
+      precip, 
+      breaks = seq(0, max(precip, na.rm = TRUE) + 0.3, by = 0.3),
+      include.lowest = TRUE,
+      right = FALSE
+    )
+  )
+
+flights_rain
+
+#finding percentage of delays per 0.3 inches of rain
+Avg_delay_per_rain <- flights_rain %>% 
+  group_by(precip_bin) %>% 
+  summarise(total_flights = n(),
+            total_arr_delayed = sum(arr_delay > 15),
+            total_dep_delayed = sum(dep_delay > 15),
+            percent_arr_delay = total_arr_delayed/total_flights,
+            percent_dep_delay = total_dep_delayed/total_flights)
+
+Avg_delay_per_rain
+
+#0.0 - 0.3 = barely rain: 23.6% Arrival Delay and 21.3% Departure Delay
+#0.3 - 0.6 = little rain: 60.5% Arrival Delay and 50.5% Departure Delay
+#0.6 - 0.9 = regular rain: 73.9% Arrival Delay and 45.6% Departure Delay
+#0.9 - 1.2 = heavy rain: 45% Arrival Delay and 50% Departure Delay
+#1.2 above = very heavy rain: 66.6% Arrival Delay and 88.8% Departure Delay
+
+#Note: it seems like although there is a relationship with higher rain and delays, in the heavy rain category it has less delays than the rest
+
+```
+
+
+
+
+
+
+**Q.4** Do flight delays occur due to their destination or the origin of the airport?
+```{r}
+
+#Checking the Average arrival delay of destinations with top 20 airports
+top_dest <- flights %>%
+  group_by(dest) %>%
+  summarize(avg_arr_delay = mean(arr_delay, na.rm = TRUE),
+            avg_dep_delay = mean(dep_delay, na.rm = TRUE)) %>%
+  slice_max(avg_arr_delay, n = 20)
+
+ggplot(top_dest, aes(x = reorder(dest, avg_arr_delay), y = avg_arr_delay, fill = dest)) +
+  geom_col() +
+  coord_flip() +
+  labs(x = "Destination", y = "Average Arrival Delay (min)") +
+  theme_minimal() +
+  guides(fill = "none")
+
+#compare the departure delay with the destinations with the highest arrival delay
+ggplot(top_dest, aes(x = reorder(dest, avg_arr_delay), y = avg_dep_delay, fill = dest)) +
+  geom_col() +
+  coord_flip() +
+  labs(x = "Destination", y = "Average Departure Delay (min)") +
+  theme_minimal() +
+  guides(fill = "none")
+
+
+```
+
+```{r}
+
+#Checking the Average arrival delay of origin
+Avg_Origin_delays <- cleaned_weather_flights %>% 
+  group_by(origin) %>% 
+  summarise(total_flights = n(),
+            total_arr_delayed = sum(arr_delay > 15),
+            total_dep_delayed = sum(dep_delay > 15),
+            percent_arr_delay = total_arr_delayed/total_flights,
+            percent_dep_delay = total_dep_delayed/total_flights)
+  
+  
+Avg_Origin_delays
+#The 3 airports in New York seems to run efficiently
+#EWR: 25.5% Arrival Delay and 24.5% Departure Delay
+#JFK: 22.9% Arrival Delay and 20% Departure Delay
+#LGA: 22.3% Arrival Delay and 18.8% Departure Delay
+
+
+#compared to the nation average
+#using data from destinations to find national average
+Nation_Average_delays <- percent_delay %>% 
+  summarise(total_flights = n(),
+             mean_avg_arr = mean(percent_arr_delay),
+      mean_avg_dep = mean(percent_dep_delay))
+    
+ Nation_Average_delays   
+
+#National average: 26.1% Arrival Delay and 25% Departure Delay   
+ 
+```
+
