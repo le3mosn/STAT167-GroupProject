@@ -183,18 +183,6 @@ Percent_delay_by_Seasons
 ```{r}
 #Checking percentage of flights by rain 
 
-#Delays by rain
-# groups precipitation by 0.3 inch of rain
-flights_rain <- cleaned_weather_flights %>%
-  mutate(
-    precip_bin = cut(
-      precip, 
-      breaks = seq(0, max(precip, na.rm = TRUE) + 0.3, by = 0.3),
-      include.lowest = TRUE,
-      right = FALSE
-    )
-  )
-
 flights_rain
 
 #finding percentage of delays per 0.3 inches of rain
@@ -216,11 +204,101 @@ Avg_delay_per_rain
 
 #Note: it seems like although there is a relationship with higher rain and delays, in the heavy rain category it has less delays than the rest
 
+
+Graph_1 <- ggplot(Avg_delay_per_rain, aes(x = precip_bin)) +
+  geom_col(aes(y = percent_arr_delay, fill = "Arrival Delay"), position = position_dodge()) +
+  scale_y_continuous(labels = scales::percent_format()) +
+  labs(x = "Precipitation Bin (inches)", y = "Percent Delayed", fill = "Delay Type",
+       title = "Flight Delays vs Precipitation") +
+  coord_flip()
+
+Graph_2 <- ggplot(Avg_delay_per_rain, aes(x = precip_bin)) +
+  geom_col(aes(y = percent_dep_delay, fill = "Departure Delay"), position = position_dodge()) +
+  scale_y_continuous(labels = scales::percent_format()) +
+  labs(x = "Precipitation Bin (inches)", y = "Percent Delayed", fill = "Delay Type",
+       title = "Flight Delays vs Precipitation") +
+  coord_flip()
+  
+grid.arrange(Graph_1, Graph_2, ncol = 2)
+```
+
+```{r}
+#By visibility
+
+#finding percentage of delays per visibility
+Avg_delay_per_vis <- cleaned_weather_flights %>% 
+  group_by(visib) %>% 
+  summarise(total_flights = n(),
+            total_arr_delayed = sum(arr_delay > 15),
+            total_dep_delayed = sum(dep_delay > 15),
+            percent_arr_delay = total_arr_delayed/total_flights,
+            percent_dep_delay = total_dep_delayed/total_flights)
+
+Avg_delay_per_vis 
+
+
+Graph1 <- ggplot(Avg_delay_per_vis , mapping = aes(x = visib)) +
+  geom_col(aes(y = percent_arr_delay, fill = "Arrival Delay"), position = "dodge") +
+  scale_y_continuous(labels = scales::percent_format()) +
+  labs(y = "Percent of Flights Delayed", fill = "Delay Type",
+       title = "Flight Delays by Visibility") 
+
+Graph2 <- ggplot(Avg_delay_per_vis , mapping = aes(x = visib)) +
+  geom_col(aes(y = percent_dep_delay, fill = "Departure Delay"), position = "dodge") +
+  scale_y_continuous(labels = scales::percent_format()) +
+  labs(y = "Percent of Flights Delayed", fill = "Delay Type",
+       title = "Flight Delays by Visibility") 
+
+grid.arrange(Graph1, Graph2, ncol = 2)
+#Note: based on the graph there is a correlation to delays and visibility however at the very low visibility there are some variables that are not high, probably due to not enough data/outliers
+```
+
+```{r}
+#By Temp
+flights_temp <- cleaned_weather_flights %>%
+  mutate(temp_group = case_when(
+    temp < 40            ~ "Low",
+    temp >= 40 & temp < 70 ~ "Medium",
+    temp >= 70           ~ "High",
+  ))
+flights_temp
+
+Avg_delay_per_temp <- flights_temp %>% 
+  group_by(temp_group) %>% 
+  summarise(total_flights = n(),
+            total_arr_delayed = sum(arr_delay > 15),
+            total_dep_delayed = sum(dep_delay > 15),
+            percent_arr_delay = total_arr_delayed/total_flights,
+            percent_dep_delay = total_dep_delayed/total_flights)
+
+Avg_delay_per_temp
+
+#Based on the data there might not be a major correlation to delays
 ```
 
 
+```{r}
+#By humidity
+flights_hum <- cleaned_weather_flights %>%
+  mutate(humidity_group = case_when(
+    humid < 30             ~ "Low",
+    humid >= 30 & humid < 60 ~ "Medium",
+    humid >= 60             ~ "High",
+  ))
+flights_hum
 
+Avg_delay_per_humid <- flights_hum %>% 
+  group_by(humidity_group) %>% 
+  summarise(total_flights = n(),
+            total_arr_delayed = sum(arr_delay > 15),
+            total_dep_delayed = sum(dep_delay > 15),
+            percent_arr_delay = total_arr_delayed/total_flights,
+            percent_dep_delay = total_dep_delayed/total_flights)
 
+Avg_delay_per_humid
+
+#Based on the data there also might be a low correlation with humidity and delays
+```
 
 
 **Q.4** Do flight delays occur due to their destination or the origin of the airport?
@@ -233,7 +311,7 @@ top_dest <- flights %>%
             avg_dep_delay = mean(dep_delay, na.rm = TRUE)) %>%
   slice_max(avg_arr_delay, n = 20)
 
-ggplot(top_dest, aes(x = reorder(dest, avg_arr_delay), y = avg_arr_delay, fill = dest)) +
+bar_1 <- ggplot(top_dest, aes(x = reorder(dest, avg_arr_delay), y = avg_arr_delay, fill = dest)) +
   geom_col() +
   coord_flip() +
   labs(x = "Destination", y = "Average Arrival Delay (min)") +
@@ -241,14 +319,14 @@ ggplot(top_dest, aes(x = reorder(dest, avg_arr_delay), y = avg_arr_delay, fill =
   guides(fill = "none")
 
 #compare the departure delay with the destinations with the highest arrival delay
-ggplot(top_dest, aes(x = reorder(dest, avg_arr_delay), y = avg_dep_delay, fill = dest)) +
+bar_2 <- ggplot(top_dest, aes(x = reorder(dest, avg_arr_delay), y = avg_dep_delay, fill = dest)) +
   geom_col() +
   coord_flip() +
   labs(x = "Destination", y = "Average Departure Delay (min)") +
   theme_minimal() +
   guides(fill = "none")
 
-
+grid.arrange(bar_1,bar_2, ncol = 2)
 ```
 
 ```{r}
