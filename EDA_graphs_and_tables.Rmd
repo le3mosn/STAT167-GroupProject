@@ -181,7 +181,7 @@ Percent_delay_by_Seasons
 ```
 
 ```{r}
-#Checking percentage of flights by rain
+#Checking percentage of flights by rain 
 
 #Delays by rain
 # groups precipitation by 0.3 inch of rain
@@ -279,7 +279,7 @@ Nation_Average_delays <- percent_delay %>%
     
  Nation_Average_delays   
 
-#National average: 26.1% Arrival Delay and 25% Departure Delay
+#National average: 26.1% Arrival Delay and 25% Departure Delay 
  
 ```
 
