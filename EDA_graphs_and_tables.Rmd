@@ -148,6 +148,61 @@ percent_delay |> arrange(desc(percent_dep_delay))
 # LAX: 20% arrival delay and 17% departure delay
 ```
 
+```{r}
+busiest_dest_delay <- percent_delay |>
+  arrange(desc(total_flights)) |>
+  slice(1:5)
+
+g1 <- ggplot(busiest_dest_delay, mapping = aes(x = dest)) +
+  geom_col(aes(y = percent_arr_delay), fill = "lightblue", position = "dodge") +
+  scale_y_continuous(labels = scales::percent_format()) +
+  labs(x = "Destination", 
+       y = "% of Flights Delayed",
+       title = "Arrival Delays in Top 5 Destinations") +
+  theme(legend.position = "none")
+
+g2 <- ggplot(busiest_dest_delay, mapping = aes(x = dest)) +
+  geom_col(aes(y = percent_dep_delay), fill = "lightblue", position = "dodge") +
+  scale_y_continuous(labels = scales::percent_format()) +
+  labs(x = "Destination", 
+       y = "% of Flights Delayed",
+       title = "Departure Delays in Top 5 Destinations") +
+  theme(legend.position = "none")
+
+
+grid.arrange(g1, g2, ncol = 2)
+
+```
+
+
+```{r}
+top5_arr_delayed <- percent_delay |>
+  arrange(desc(percent_arr_delay)) |>
+  slice(1:5)
+
+top5_dep_delayed <- percent_delay |>
+  arrange(desc(percent_dep_delay)) |>
+  slice(1:5)
+
+b1 <- ggplot(top5_arr_delayed, mapping = aes(x = dest)) +
+  geom_col(aes(y = percent_arr_delay), fill = "salmon", position = "dodge") +
+  scale_y_continuous(labels = scales::percent_format()) +
+  labs(x = "Destination", 
+       y = "% of Flights Delayed",
+       title = "Top 5 Destinations w/ Arrival Delays") +
+  theme(legend.position = "none")
+
+b2 <- ggplot(top5_dep_delayed, mapping = aes(x = dest)) +
+  geom_col(aes(y = percent_dep_delay), fill = "salmon", position = "dodge") +
+  scale_y_continuous(labels = scales::percent_format()) +
+  labs(x = "Destination",
+       y = "% of Flights Delayed",
+       title = "Top 5 Destinations w/ Departure Delays") +
+  theme(legend.position = "none")
+  
+
+grid.arrange(b1, b2, ncol = 2)
+```
 
 **Q.3** Do specific weather conditions and seasons delay flights more than others?
 ```{r}
