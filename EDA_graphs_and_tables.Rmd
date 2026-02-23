@@ -93,7 +93,32 @@ bar2 <- ggplot(month_arr_delay, aes(x = month, y = avg_arr_delay, fill = avg_arr
 grid.arrange(bar1, bar2, ncol = 2)
 ```
 
+```{r}
+# improved barplots from above
+month_delays <- cleaned_weather_flights |>
+  group_by(month) |>
+  summarise(avg_arr = mean(arr_delay),
+            avg_dep = mean(dep_delay)) |>
+  arrange(month) |>
+  mutate(abbre_month = c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"))
 
+barplot1 <- ggplot(month_delays, aes(x = reorder(abbre_month, -month))) +
+  geom_col(aes(y = avg_dep, fill = avg_dep < 0), position = "dodge") +
+  labs(x = "Month", 
+       y = "Average Flight Delay (mins)",
+       title = "Average Departure Delay by Month") +
+  theme(legend.position = "none") +
+  coord_flip()
+
+barplot2 <- ggplot(month_delays, aes(x = reorder(abbre_month, -month))) +
+  geom_col(aes(y = avg_arr, fill = avg_arr < 0), position = "dodge") +
+  labs(x = "Month", 
+       y = "Average Flight Delay (mins)",
+       title = "Average Arrival Delay by Month") +
+  coord_flip()
+
+grid.arrange(barplot1, barplot2, ncol = 2)
+```
 
 
 
