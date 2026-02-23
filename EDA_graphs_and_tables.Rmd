@@ -279,7 +279,7 @@ Nation_Average_delays <- percent_delay %>%
     
  Nation_Average_delays   
 
-#National average: 26.1% Arrival Delay and 25% Departure Delay  
+#National average: 26.1% Arrival Delay and 25% Departure Delay   
  
 ```
 
