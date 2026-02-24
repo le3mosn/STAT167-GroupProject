@@ -441,3 +441,35 @@ Nation_Average_delays <- percent_delay %>%
  
 ```
 
+**Q.5** 
+
+```{r}
+(grouped_days <- cleaned_weather_flights %>% 
+  summarise(total_flights = n(),
+            avg_arr_delay_per_day = sum(arr_delay)/total_flights,
+            avg_dep_delay_per_day = sum(dep_delay)/total_flights,
+            day,
+            month) %>%
+  arrange(day, month, desc(avg_arr_delay_per_day), desc(avg_dep_delay_per_day)))
+
+bar_1 <- ggplot(data = grouped_days, mapping = aes(x = month, y = avg_arr_delay_per_day)) +
+  geom_col()
+
+bar_2 <- ggplot(data = grouped_days, mapping = aes(x = month, y = avg_dep_delay_per_day)) +
+  geom_col()
+
+grid.arrange(bar_1,bar_2, ncol = 2)
+```
+```{r}
+for 
+
+
+(holiday_delay <- cleaned_weather_flights %>%
+  filter(day == 1, month == 1) %>%
+   summarize(flight_count = n(),
+             avg_arr_delay = mean(arr_delay),
+             avg_dep_delay = mean(dep_delay))
+ )
+```
+
+
