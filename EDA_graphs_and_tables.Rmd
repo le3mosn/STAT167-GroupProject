@@ -465,7 +465,7 @@ holiday_delays <- holiday_dates %>%
 holiday_delays
 ```
 ```{r}
-# Comparing pwecwntrage of delays for eacg=h holday and non-holidays on average
+# Comparing percentage of delays for each holiday and non-holidays on average
 h1 <- ggplot(holiday_delays, aes(x = reorder(holiday_period, -percent_arr_delay))) +
   geom_col(aes(y = percent_arr_delay, fill = holiday_period == "Non-Holiday"), position = "dodge") +
   scale_y_continuous(labels = scales::percent_format()) +
@@ -509,4 +509,46 @@ ggplot(holiday_long, aes(x = holiday_period, y = percent, fill = delay_type)) +
 ```
 
 ```{r}
+holiday_dates_summary <- cleaned_weather_flights %>%
+  mutate(
+    date = as.Date(time_hour),
+    holiday_period = case_when(
+      date %in% seq(as.Date("2013-01-01"), as.Date("2013-01-01"), by = "day") |
+      date %in% seq(as.Date("2013-05-25"), as.Date("2013-05-27"), by = "day") |
+      date %in% seq(as.Date("2013-07-04"), as.Date("2013-07-07"), by = "day")|
+      date %in% seq(as.Date("2013-11-28"), as.Date("2013-12-01"), by = "day") |
+      date %in% seq(as.Date("2013-12-24"), as.Date("2013-12-31"), by = "day") ~ "Holiday",
+      TRUE ~ "Non-Holiday"
+    )
+  )
 
+holiday_delays <- holiday_dates_summary %>%
+  group_by(holiday_period) %>%
+  summarise(
+    total_flights = n(),
+    total_arr_delayed = sum(arr_delay > 15),
+    total_dep_delayed = sum(dep_delay > 15),
+    percent_arr_delay = total_arr_delayed / total_flights,
+    percent_dep_delay = total_dep_delayed / total_flights
+  ) %>%
+  arrange(desc(percent_dep_delay))
+
+holiday_long <- holiday_delays %>%
+  select(holiday_period, percent_arr_delay, percent_dep_delay) %>%
+  pivot_longer(cols = c(percent_arr_delay, percent_dep_delay),
+               names_to = "delay_type",
+               values_to = "percent") %>%
+  mutate(delay_type = recode(delay_type,
+                             "percent_arr_delay" = "Arrival Delay",
+                             "percent_dep_delay" = "Departure Delay"))
+
+# Combined plot
+ggplot(holiday_long, aes(x = holiday_period, y = percent, fill = delay_type)) +
+  geom_col(position = "dodge") +
+  scale_y_continuous(labels = scales::percent_format()) +
+  labs(x = "Period",
+       y = "% of Flights Delayed",
+       fill = "Delay Type",
+       title = "Flight Delays: Holiday vs Non-Holiday") +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 10))
