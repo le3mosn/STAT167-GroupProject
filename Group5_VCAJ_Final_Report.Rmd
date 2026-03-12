@@ -1,0 +1,69 @@
+---
+title: "Final Project Report"
+author: "Group 5 - VCAJ"
+date: "2026-03-13"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Project Description
+- Clearly defines primary research questions/objectives
+- Project background and motivation
+- Importance/relevance of problem
+- Outlines expected outcomes, hypotheses, or analytical goals
+
+
+
+## Data Description & Preparation
+- Specifies datasets used + provides data source/link
+- Describes structure of data + variables involved
+- Identify variables relevant to research questions
+- Discusses any data limitations, missing values, cleaning steps
+- Explains integration approach if multiple datasets are used
+
+
+
+## Exploratory Data Analysis
+- Visualizations w/ clear titles + labels
+- Examine trends, distributions, relationships
+- Interpret EDA results + connect them to research goals
+
+
+
+## Methodology & Analysis
+- Explain choice of analytical/modeling methods
+- Justify methods based on project goals + data type
+- Identify predictors + outcomes clearly
+- Address model assumptions and how they are assessed
+- Demonstrates depth in connecting methods to research questions
+
+
+
+## Model Implementation & Evaluation
+- Uses appropriate model validation strategies (cross-validation and/or validation set approach)
+- Employ relevant + justified performance metrics
+- Clearly explains model performance + any tradeoffs
+- Considers model complexity, overfitting, model selection
+
+
+## Results & Discussion
+- Results presented w/ interpretation in context
+- Links results back to original questions/objectives.
+- Discuss limitations, implications, potential real-world impact
+- Offer thoughtful insights supported by evidence
+
+
+
+## Team Member Contributions
+
+* Vincent Chau - 
+* Christie Wong - 
+* Jimmy Ieng - 
+* Arsenii Vasilev - 
+
+
+

@@ -50,28 +50,35 @@ cleaned_weather_flights <- drop_na(cleaned_weather_flights)
 
 
 
-
 **Q.1** How do holidays/popular vacation times affect delays?
 
 ```{r}
+month_delays <- cleaned_weather_flights |>
+  group_by(month) |>
+  summarise(avg_arr = mean(arr_delay),
+            avg_dep = mean(dep_delay),
+            total = n(),
+            total_arr_delayed = sum(arr_delay > 15),
+            total_dep_delayed = sum(dep_delay > 15),
+            percent_arr_delay = total_arr_delayed/total,
+            percent_dep_delay = total_dep_delayed/total) |>
+  arrange(month) |>
+  mutate(abbre_month = c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"))
+
+# Months w/ most flights
+month_delays |> arrange(desc(total))
 
 # Months with the most departure delays on average
-(month_dep_delay <- cleaned_weather_flights |>
-  group_by(month) |>
-  summarise(avg_dep_delay = mean(dep_delay)) |>
-  arrange(desc(avg_dep_delay)))
+month_delays |> arrange(desc(avg_dep))
 
-# Months with the most arrival delays on average
-(month_arr_delay <- cleaned_weather_flights |>
-  group_by(month) |>
-  summarise(avg_arr_delay = mean(arr_delay)) |>
-  arrange(desc(avg_arr_delay)))
+# Months w/ most arrival delays on average
+month_delays |> arrange(desc(avg_arr))
 
-# Total flights per month
-cleaned_weather_flights |>
-  group_by(month) |>
-  summarise(flight_total = n()) |>
-  arrange(desc(flight_total))
+# Months w/ high % of departure delays
+month_delays |> arrange(desc(percent_dep_delay))
+
+# Months w/ high % of arrival delays
+month_delays |> arrange(desc(percent_arr_delay))
 
 # Top 3 months w/ highest delays: July, June, December
 # Months with the most amount of flights: August, October, July
@@ -80,62 +87,66 @@ cleaned_weather_flights |>
 
 ```{r}
 library(gridExtra)
-bar1 <- ggplot(month_dep_delay, aes(x = month, y = avg_dep_delay, fill = "salmon")) +
-  geom_col() +
-  geom_text(aes(label = month), vjust = 1.5) +
-  theme(legend.position = "none")
-
-bar2 <- ggplot(month_arr_delay, aes(x = month, y = avg_arr_delay, fill = avg_arr_delay < 0)) +
-  geom_col() +
-  geom_text(aes(label = month), vjust = 1.5) +
+barplot1 <- ggplot(month_delays, aes(x = reorder(abbre_month, -month))) +
+  geom_col(aes(y = avg_dep, fill = avg_dep < 0), position = "dodge") +
+  labs(x = "Month", 
+       y = "Average Flight Delay (mins)",
+       title = "Average Departure Delay by Month") +
   theme(legend.position = "none") +
-  ylim(-7, 18)
+  coord_flip()
 
-grid.arrange(bar1, bar2, ncol = 2)
+barplot2 <- ggplot(month_delays, aes(x = reorder(abbre_month, -month))) +
+  geom_col(aes(y = avg_arr, fill = avg_arr < 0), position = "dodge") +
+  labs(x = "Month", 
+       y = "Average Flight Delay (mins)",
+       title = "Average Arrival Delay by Month") +
+  coord_flip()
+
+grid.arrange(barplot1, barplot2, ncol = 2)
 ```
 
+```{r}
+per_bar <- ggplot(month_delays, aes(x = reorder(abbre_month, -month))) +
+  geom_col(aes(y = percent_dep_delay, fill = percent_dep_delay > 0.27), position = "dodge") +
+  labs(x = "Month", 
+       y = "% of Flights Delayed",
+       title = "% of Depart Delayed Flights by Month") +
+  theme(legend.position = "none") +
+  scale_y_continuous(labels = scales::percent_format()) +
+  coord_flip()
 
+per_bar2 <- ggplot(month_delays, aes(x = reorder(abbre_month, -month))) +
+  geom_col(aes(y = percent_arr_delay, fill = percent_arr_delay > 0.28), position = "dodge") +
+  labs(x = "Month", 
+       y = "% of Flights Delayed",
+       title = "% of Arrival Delayed Flights by Month") +
+  theme(legend.position = "none") +
+  scale_y_continuous(labels = scales::percent_format()) +
+  coord_flip()
+
+grid.arrange(per_bar, per_bar2, ncol = 2)
+```
 
 
 
 **Q.2** Do popular vacation locations mean an increase in flight delays?
 
 ```{r}
-destinations <- cleaned_weather_flights |>
-  group_by(dest) |>
-  summarise(total_flights = n(),
-            avg_arr_delay = mean(arr_delay),
-            avg_dep_delay = mean(dep_delay))
-  
-destinations |> arrange(desc(total_flights))
-# lots of flights going into Atlanta (GA), Chicago (IL) and Los Angeles (LAX) in 2013
-
-destinations |> arrange(desc(avg_arr_delay))
-# most avg arrival delay: CAE, TUL, OKC
-
-destinations |> arrange(desc(avg_dep_delay))
-# most avg dep_delay is: TUL (Oklahoma), CAE (South Carolina), OKC (Oklahoma) 
-
-# ATL - arr: 11.28, dep: 12.41
-# ORD - arr: 5.866, dep: 13.44
-# LAX - arr: 0.525, dep: 9.35
-
-```
-
-
-```{r}
-percent_delay <- cleaned_weather_flights |>
+dest_delay <- cleaned_weather_flights |>
   group_by(dest) |>
   summarise(total_flights = n(),
             total_arr_delayed = sum(arr_delay > 15),
             total_dep_delayed = sum(dep_delay > 15),
             percent_arr_delay = total_arr_delayed/total_flights,
             percent_dep_delay = total_dep_delayed/total_flights)
+  
+dest_delay |> arrange(desc(total_flights))
+# lots of flights going into Atlanta (GA), Chicago (IL) and Los Angeles (LAX) in 2013
 
-percent_delay |> arrange(desc(percent_arr_delay))
+dest_delay |> arrange(desc(percent_arr_delay))
 # CAE, OKC, TUL
 
-percent_delay |> arrange(desc(percent_dep_delay))
+dest_delay |> arrange(desc(percent_dep_delay))
 # JAC, SBN, CAE, TUL, OKC
 # Keep in mind JAC and SBN both have less than 25 flights
 
@@ -147,7 +158,66 @@ percent_delay |> arrange(desc(percent_dep_delay))
 # ATL: 25% arrival delay and 20% departure delay
 # ORD: 23% arrival delay and 22% departure delay
 # LAX: 20% arrival delay and 17% departure delay
+
 ```
+
+```{r}
+# Finding destinations with the most % of flights delayed (departure + arrival)
+
+top5_arr_delayed <- dest_delay |>
+  arrange(desc(percent_arr_delay)) |>
+  slice(1:5)
+
+top5_dep_delayed <- dest_delay |>
+  arrange(desc(percent_dep_delay)) |>
+  slice(1:5)
+
+b1 <- ggplot(top5_arr_delayed, mapping = aes(x = reorder(dest, -percent_arr_delay))) +
+  geom_col(aes(y = percent_arr_delay), fill = "salmon", position = "dodge") +
+  scale_y_continuous(labels = scales::percent_format()) +
+  labs(x = "Destination", 
+       y = "% of Flights Delayed",
+       title = "Top 5 Destinations w/ Arrival Delays") +
+  theme(legend.position = "none")
+
+b2 <- ggplot(top5_dep_delayed, mapping = aes(x = reorder(dest, -percent_dep_delay))) +
+  geom_col(aes(y = percent_dep_delay), fill = "salmon", position = "dodge") +
+  scale_y_continuous(labels = scales::percent_format()) +
+  labs(x = "Destination",
+       y = "% of Flights Delayed",
+       title = "Top 5 Destinations w/ Departure Delays") +
+  theme(legend.position = "none")
+  
+
+grid.arrange(b1, b2, ncol = 2)
+```
+
+
+```{r}
+# Comparing with delays from busiest locations
+
+busiest_dest_delay <- dest_delay |>
+  arrange(desc(total_flights)) |>
+  slice(1:5)
+
+g1 <- ggplot(busiest_dest_delay, mapping = aes(x = reorder(dest, -percent_arr_delay))) +
+  geom_col(aes(y = percent_arr_delay, fill = dest), position = "dodge") +
+  scale_y_continuous(labels = scales::percent_format()) +
+  labs(x = "Destination", 
+       y = "% of Flights Delayed",
+       title = "Arrival Delays in Top 5 Destinations") 
+
+g2 <- ggplot(busiest_dest_delay, mapping = aes(x = reorder(dest, -percent_dep_delay))) +
+  geom_col(aes(y = percent_dep_delay, fill = dest), position = "dodge") +
+  scale_y_continuous(labels = scales::percent_format()) +
+  labs(x = "Destination", 
+       y = "% of Flights Delayed",
+       title = "Departure Delays in Top 5 Destinations")
+
+grid.arrange(g1, g2, ncol = 2)
+
+```
+
 
 
 **Q.3** Do specific weather conditions and seasons delay flights more than others?
@@ -438,6 +508,7 @@ bar_2 <- ggplot(top_dest, aes(x = reorder(dest, avg_arr_delay), y = avg_dep_dela
 grid.arrange(bar_1,bar_2, ncol = 2)
 ```
 
+
 ```{r}
 dest_lm_arr <- lm(arr_delay ~ dest ,cleaned_weather_flights)
 
@@ -476,6 +547,60 @@ Nation_Average_delays <- percent_delay %>%
 
 #National average: 26.1% Arrival Delay and 25% Departure Delay   
  
+
+```
+
+
+**Q.5**Are flight delays more likely during the holidays?
+```{r}
+# Defining holday dates for year 2013
+holiday_dates <- cleaned_weather_flights %>%
+  mutate(
+    date = as.Date(time_hour),
+    holiday_period = case_when(
+      date %in% seq(as.Date("2013-01-01"), as.Date("2013-01-01"), by = "day") ~ "New Year's",
+      date %in% seq(as.Date("2013-05-25"), as.Date("2013-05-27"), by = "day") ~ "Memorial Day",
+      date %in% seq(as.Date("2013-07-04"), as.Date("2013-07-07"), by = "day") ~ "Independence Day",
+      date %in% seq(as.Date("2013-11-28"), as.Date("2013-12-01"), by = "day") ~ "Thanksgiving",
+      date %in% seq(as.Date("2013-12-24"), as.Date("2013-12-31"), by = "day") ~ "Christmas/NYE",
+      TRUE ~ "Non-Holiday"
+    )
+  )
+
+# Summarizing delays for holidays
+holiday_delays <- holiday_dates %>%
+  group_by(holiday_period) %>%
+  summarise(
+    total_flights = n(),
+    total_arr_delayed = sum(arr_delay > 15),
+    total_dep_delayed = sum(dep_delay > 15),
+    percent_arr_delay = total_arr_delayed / total_flights,
+    percent_dep_delay = total_dep_delayed / total_flights
+  ) %>%
+  arrange(desc(percent_dep_delay))
+
+holiday_delays
+```
+```{r}
+# Comparing percentage of delays for each holiday and non-holidays on average
+h1 <- ggplot(holiday_delays, aes(x = reorder(holiday_period, -percent_arr_delay))) +
+  geom_col(aes(y = percent_arr_delay, fill = holiday_period == "Non-Holiday"), position = "dodge") +
+  scale_y_continuous(labels = scales::percent_format()) +
+  labs(x = "Period", y = "% of Flights Delayed",
+       title = "Holiday vs Non-Holiday:\n Arrival Delays") +
+  theme(legend.position = "none") +
+  coord_flip()
+
+
+h2 <- ggplot(holiday_delays, aes(x = reorder(holiday_period, -percent_dep_delay))) +
+  geom_col(aes(y = percent_dep_delay, fill = holiday_period == "Non-Holiday"), position = "dodge") +
+  scale_y_continuous(labels = scales::percent_format()) +
+  labs(x = "Period", y = "% of Flights Delayed",
+       title = "Holiday vs Non-Holiday:\n Departure Delays") +
+  theme(legend.position = "none") +
+  coord_flip()
+
+grid.arrange(h1, h2, ncol = 2)
 ```
 The 3 airports in New York seems to run efficiently
 EWR: 25.5% Arrival Delay and 24.5% Departure Delay
@@ -501,3 +626,69 @@ Based on the linear model, although there are some destinations that are not sta
 
 Origins:
 For the origin based on the linear model, it shows there is a relationship with each of the three origin flights in NYC, as they are all statistically significant with a p-value less than 0.05. EWR leading to 9 minutes of delays, JFK and LFA arrive 3 minutes early. However, the origins only explain less that 1% of the delays, meaning they are not a major factor in explaining the data alone.
+```{r}
+holiday_long <- holiday_delays %>%
+  select(holiday_period, percent_arr_delay, percent_dep_delay) %>%
+  pivot_longer(cols = c(percent_arr_delay, percent_dep_delay),
+               names_to = "delay_type",
+               values_to = "percent") %>%
+  mutate(delay_type = recode(delay_type,
+                             "percent_arr_delay" = "Arrival Delay",
+                             "percent_dep_delay" = "Departure Delay"))
+
+# Combined plot
+ggplot(holiday_long, aes(x = holiday_period, y = percent, fill = delay_type)) +
+  geom_col(position = "dodge") +
+  scale_y_continuous(labels = scales::percent_format()) +
+  labs(x = "Period",
+       y = "% of Flights Delayed",
+       fill = "Delay Type",
+       title = "Flight Delays: Holiday vs Non-Holiday") +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 10))
+```
+
+```{r}
+holiday_dates_summary <- cleaned_weather_flights %>%
+  mutate(
+    date = as.Date(time_hour),
+    holiday_period = case_when(
+      date %in% seq(as.Date("2013-01-01"), as.Date("2013-01-01"), by = "day") |
+      date %in% seq(as.Date("2013-05-25"), as.Date("2013-05-27"), by = "day") |
+      date %in% seq(as.Date("2013-07-04"), as.Date("2013-07-07"), by = "day")|
+      date %in% seq(as.Date("2013-11-28"), as.Date("2013-12-01"), by = "day") |
+      date %in% seq(as.Date("2013-12-24"), as.Date("2013-12-31"), by = "day") ~ "Holiday",
+      TRUE ~ "Non-Holiday"
+    )
+  )
+
+holiday_delays <- holiday_dates_summary %>%
+  group_by(holiday_period) %>%
+  summarise(
+    total_flights = n(),
+    total_arr_delayed = sum(arr_delay > 15),
+    total_dep_delayed = sum(dep_delay > 15),
+    percent_arr_delay = total_arr_delayed / total_flights,
+    percent_dep_delay = total_dep_delayed / total_flights
+  ) %>%
+  arrange(desc(percent_dep_delay))
+
+holiday_long <- holiday_delays %>%
+  select(holiday_period, percent_arr_delay, percent_dep_delay) %>%
+  pivot_longer(cols = c(percent_arr_delay, percent_dep_delay),
+               names_to = "delay_type",
+               values_to = "percent") %>%
+  mutate(delay_type = recode(delay_type,
+                             "percent_arr_delay" = "Arrival Delay",
+                             "percent_dep_delay" = "Departure Delay"))
+
+# Combined plot
+ggplot(holiday_long, aes(x = holiday_period, y = percent, fill = delay_type)) +
+  geom_col(position = "dodge") +
+  scale_y_continuous(labels = scales::percent_format()) +
+  labs(x = "Period",
+       y = "% of Flights Delayed",
+       fill = "Delay Type",
+       title = "Flight Delays: Holiday vs Non-Holiday") +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 10))
