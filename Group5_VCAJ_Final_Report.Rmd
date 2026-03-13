@@ -56,6 +56,10 @@ knitr::opts_chunk$set(echo = TRUE)
 - Discuss limitations, implications, potential real-world impact
 - Offer thoughtful insights supported by evidence
 
+## Data Description
+  For our dataset, we used the “flights” and “weather” datasets from the “nycflights13” library. We decided that the important variables we wanted to look further into were month, day, year, destination, arrival delay, departure delay, temperature, precipitation, humidity, visibility, origin, and time. We decided to integrate the two datasets by the origin and time. Then we retained only the variables we considered important, as listed earlier, and used them to answer our questions. When looking at the dataset, we found some missing values, so we decided to remove any rows with NAs in any column. This reduced our observations from around 336k to 325k. 
+  While working on the project, some limitations were encountered. Our first limitation was that we only had data from 2013, which means our dataset is limited to one year and includes only flights departing from NYC, so we can only analyze flights in NYC rather than flights across the whole country. One last limitation is that important data may have been missing or variables omitted.
+
 
 
 ## Team Member Contributions
