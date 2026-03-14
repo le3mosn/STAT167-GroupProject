@@ -15,7 +15,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
   When traveling through airlines, there are various reasons to why the flight may be delayed. Whether the weather conditions are inadequate, the day you are flying out is the busiest, the destination airport may be packed and inefficient, anything can be a reason of delay. In our analysis, we will try and analyze a variety of these factors to see if there are any predictors for flight delay. In today's age flights are crucial moving the world forward. The world's most influential powers rely on aviation to visit various places for important business. Important resources and materials being sent via airlines each day, war relief to life saving organs. Any delays in these materials may be the line between life and death for people. Finding a plausible predictor for flight delays may drastically improve the efficiency of flights for millions of flyers each day.
   
-## Questions we will be answering:
+### Questions we will be answering:
   
 - Q1: Do flight delays occur due to destination or region?
   H[0]: Yes, destination/region does affect flight delay.
@@ -82,15 +82,6 @@ cleaned_weather_flights <- drop_na(cleaned_weather_flights)
 
 
 ## Exploratory Data Analysis and Statistical Models
-- Visualizations w/ clear titles + labels
-- Examine trends, distributions, relationships
-- Interpret EDA results + connect them to research goals
-
-- Explain choice of analytical/modeling methods
-- Justify methods based on project goals + data type
-- Identify predictors + outcomes clearly
-- Address model assumptions and how they are assessed
-- Demonstrates depth in connecting methods to research questions
 
 #### Q1: Do flight delays occur due to destination or region?
 
@@ -191,7 +182,7 @@ region_data <- cleaned_weather_flights |>
 summary(lm(arr_delay ~ region, data = region_data))
 summary(lm(dep_delay ~ region, data = region_data))
 ```
-  Linear regression models were used to further analyze the relationship between destinations and flight delays. Because there are more than 100 unique destinations in the dataset, each airport was grouped into one of 6 geographic regions within U.S. territory being the Midwest, Northeast, Southeast, Southwest, West, and Other( includes Puerto Rico and the Virgin Islands). Our results showed that all regions significantly differed from the Midwest, except for the Southeast region in arrival delays. Overall, destination region is statistically significant and affects delays in both models, but it is a weak predictor on its own as the R-squared values show that less than 1% of the variation in delays can be explained by destination region.
+  Linear regression models were used to further analyze the relationship between destinations and flight delays. Because there are more than 100 unique destinations in the dataset, each airport was grouped into one of 6 geographic regions within U.S. territory being the Midwest, Northeast, Southeast, Southwest, West, and Other( includes Puerto Rico and the Virgin Islands) to simplify and generalize our analysis. Our results showed that all regions significantly differed from the Midwest, except for the Southeast region in arrival delays. Overall, destination region is statistically significant and affects delays in both models, but it is a weak predictor on its own as the R-squared values show that less than 1% of the variation in delays can be explained by destination region.
 
 
 #### Q2: Do certain months have an effect on flight delays?
@@ -640,8 +631,10 @@ h2 <- ggplot(holiday_delays, aes(x = reorder(holiday_period, -percent_dep_delay)
 
 grid.arrange(h1, h2, ncol = 2)
 ```
-New Year's day has higher probability of arrival delays and period from Christmas to New Year's Eve has higher probability of departure delays. Based on that we can say that delays do happen more often during the winter holiday season.
-```{r}
+  
+  New Year's day has higher probability of arrival delays and period from Christmas to New Year's Eve has higher probability of departure delays. Based on that we can say that delays do happen more often during the winter holiday season.
+  
+```{r, echo = FALSE}
 holiday_long <- holiday_delays %>%
   select(holiday_period, percent_arr_delay, percent_dep_delay) %>%
   pivot_longer(cols = c(percent_arr_delay, percent_dep_delay),
@@ -662,8 +655,10 @@ ggplot(holiday_long, aes(x = holiday_period, y = percent, fill = delay_type)) +
   theme_minimal() +
   theme(plot.title = element_text(size = 10))
 ```
+
 Here we can see that only on New Year's arrival delays happen significantly more often than departure delays.
-```{r}
+
+```{r echo = FALSE}
 holiday_model_data <- holiday_dates %>%
   mutate(
     holiday = ifelse(holiday_period == "Non-Holiday", 0, 1),
@@ -683,9 +678,7 @@ summary(m1)
 summary(m2)
 ```
 
-
-
-```{r}
+```{r echo = FALSE}
 model_metrics <- function(model, label) {
   tibble(
     Model  = label,
@@ -701,12 +694,10 @@ bind_rows(
   model_metrics(m2, "M2: Specific Holidays")
 )
 ```
-Two linear regression models were built to see if holidays are a good predictor of the flight delays. M1 considered only holiday and non-holiday seasons and M2 took each holiday into account besides the non-holiday period. Based on extremely R^2 values and high RMSE it is clear that holidays is not a good predictor of arrival or departure delays.
+  Two linear regression models were built to see if holidays are a good predictor of the flight delays. M1 considered only holiday and non-holiday seasons and M2 took each holiday into account besides the non-holiday period. Based on extremely R^2 values and high RMSE, it is clear that holidays is not a good predictor of arrival or departure delays.
+
+
 ## Model Implementation & Evaluation
-- Uses appropriate model validation strategies (cross-validation and/or validation set approach)
-- Employ relevant + justified performance metrics
-- Clearly explains model performance + any tradeoffs
-- Considers model complexity, overfitting, model selection
 
 Cross validation was conducted on all the different factors.
 
@@ -740,7 +731,7 @@ cv_result_season
 Based on all the cross validation sets the model with the best predictive performance seems to be the weather condition model as it has the lowest MSE of 1943.
 
 ### CV holidays
-```{r}
+```{r echo = FALSE}
 set.seed(42)
 cv_ctrl <- trainControl(method = "cv", number = 5)
 
@@ -752,7 +743,8 @@ cv_m2 <- train(dep_delay ~ holiday_period,
 
 resamples(list(M1 = cv_m1, M2 = cv_m2)) %>% summary()
 ```
-Two linear regression models were compared using 5-fold cross-validation. The model using specific holiday periods performed slightly better than the binary holiday model, but both models had extremely low explanatory power. 
+  
+  Two linear regression models were compared using 5-fold cross-validation. The model using specific holiday periods performed slightly better than the binary holiday model, but both models had extremely low explanatory power. 
 
 
 ## Results & Discussion
@@ -771,6 +763,6 @@ Two linear regression models were compared using 5-fold cross-validation. The mo
 * Jimmy Ieng - Worked on data cleaning/EDA, worked on modeling for questions three and four worked on final rmd.
 * Arsenii Vasilev - Worked on EDA and modeling for question five, worked on final rmd. 
 
-
+Link to Github Repo: 
 
 
