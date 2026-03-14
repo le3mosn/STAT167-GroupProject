@@ -701,38 +701,50 @@ bind_rows(
 
 ## Model Implementation & Evaluation
 
-Cross validation was conducted on all the different factors.
+```{r include = FALSE}
+set.seed(42)
+region_data <- na.omit(region_data)
+region_glm_arr <- glm(arr_delay ~ region, data = region_data)
+cv_result_region <- cv.glm(region_data, region_glm_arr, K = 10)$delta
+cv_result_region
 
-#### CV weather
-```{r, echo=FALSE}
+region_glm_dep <- glm(dep_delay ~ region, data = region_data)
+cv_region_dep <- cv.glm(region_data, region_glm_dep, K = 10)$delta
+cv_region_dep
+
+month_glm_arr <- glm(arr_delay ~ factor(month), data = cleaned_weather_flights)
+cv_result_month <- cv.glm(cleaned_weather_flights, month_glm_arr, K = 10)$delta
+cv_result_month
+
+month_glm_dep <- glm(dep_delay ~ factor(month), data = cleaned_weather_flights)
+cv_month_dep <- cv.glm(cleaned_weather_flights, month_glm_dep, K = 10)$delta
+cv_month_dep
+
 weather_glm_arr <- glm(arr_delay ~ precip_bin + visib + humid, data = flights_rain)
-
 cv_result_weather <- cv.glm(flights_rain,  weather_glm_arr, K = 10)$delta
-
 cv_result_weather
-```
 
-#### CV Origin
-```{r, echo=FALSE}
+weather_glm_dep <- glm(dep_delay ~ precip_bin + visib + humid, data = flights_rain)
+cv_weather_dep <- cv.glm(flights_rain,  weather_glm_dep, K = 10)$delta
+cv_weather_dep
+
 origin_glm_arr <- glm(arr_delay ~ origin, data = cleaned_weather_flights)
-
 cv_result_origin <- cv.glm(cleaned_weather_flights, origin_glm_arr, K = 10)$delta
-
 cv_result_origin
-```
 
-#### CV seasons
-```{r, echo=FALSE}
+origin_glm_dep <- glm(dep_delay ~ origin, data = cleaned_weather_flights)
+cv_origin_dep <- cv.glm(cleaned_weather_flights, origin_glm_dep, K = 10)$delta
+cv_origin_dep
+
 season_glm_arr <- glm(arr_delay ~ season, data = flights_season)
-
 cv_result_season <- cv.glm(flights_season,  season_glm_arr, K = 10)$delta
-
 cv_result_season
+
+season_glm_dep <- glm(dep_delay ~ season, data = flights_season)
+cv_season_dep <- cv.glm(flights_season,  season_glm_dep, K = 10)$delta
+cv_season_dep
 ```
-
-Based on all the cross validation sets the model with the best predictive performance seems to be the weather condition model as it has the lowest MSE of 1943.
-
-### CV holidays
+  Cross validation was conducted on all factors of flight delays for arrivals and departures to evaluate the predictive performance of their linear regression models. Based on all the cross validation sets, all the models returned high mean squared error values ranging from about 1,500 to 2,000 for both arrival and departure delays, meaning that our models were not good at predicting delays. The model with the best predictive performance for arrival delays was the weather conditions model. It has the lowest MSE of 1,943 or RMSE of 44.07, where on average, predictions are about 44 minutes away from the actual arrival delays. Origin had the worst predictive performance for arrival delays with an MSE of 1,992 or RMSE of 44.63. For departure delays, the models with the best predictive performance were months and weather conditions with the lowest MSEs of about 1,581 or RMSEs of 39.76, where predictions are about 40 minutes away from actual departure delays on average. The worst predictive model for departures was region with an MSE of 1,604 or RMSE of 40.05.
 ```{r echo = FALSE}
 set.seed(42)
 cv_ctrl <- trainControl(method = "cv", number = 5)
@@ -746,7 +758,7 @@ cv_m2 <- train(dep_delay ~ holiday_period,
 resamples(list(M1 = cv_m1, M2 = cv_m2)) %>% summary()
 ```
   
-  Two linear regression models were compared using 5-fold cross-validation. The model using specific holiday periods performed slightly better than the binary holiday model, but both models had extremely low explanatory power. 
+  For holidays, two linear regression models were compared using 5-fold cross-validation. The model using specific holiday periods performed slightly better than the binary holiday model, but both models had extremely low explanatory power. 
 
 
 ## Results & Discussion
@@ -754,8 +766,6 @@ resamples(list(M1 = cv_m1, M2 = cv_m2)) %>% summary()
 - Links results back to original questions/objectives.
 - Discuss limitations, implications, potential real-world impact
 - Offer thoughtful insights supported by evidence
-
-
 
 
 ## Team Member Contributions
