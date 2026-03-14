@@ -184,6 +184,9 @@ region_data <- cleaned_weather_flights |>
 summary(lm(arr_delay ~ region, data = region_data))
 summary(lm(dep_delay ~ region, data = region_data))
 
+not_canceled <- flights %>%
+  filter(!is.na(dep_delay), !is.na(arr_delay))
+
 not_canceled <- inner_join(not_canceled, inc_region)
 
 delay_dest <- not_canceled %>%
