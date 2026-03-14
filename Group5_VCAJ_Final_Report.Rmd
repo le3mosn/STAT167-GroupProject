@@ -1,6 +1,6 @@
 ---
-title: "Final Project Report"
-author: "Group 5 - VCAJ"
+title: "Group 5 (VCAJ) Final Project Report"
+author: "Vincent Chau, Christie Wong, Jimmy Ieng, Arsenii Vasilev"
 date: "2026-03-13"
 output:
   pdf_document: default
@@ -10,6 +10,8 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+
+# Different Factors on Flight Performance
 
 ## Project Description
 
