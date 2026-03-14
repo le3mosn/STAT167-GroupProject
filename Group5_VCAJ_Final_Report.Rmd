@@ -829,5 +829,6 @@ resamples(list(M1 = cv_m1, M2 = cv_m2)) %>% summary()
 * Arsenii Vasilev - Worked on EDA and modeling for question five, worked on final rmd. 
 
 **Link to Github Repo**: 
+  https://github.com/le3mosn/STAT167-GroupProject.git
 
 
