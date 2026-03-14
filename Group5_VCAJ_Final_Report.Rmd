@@ -582,7 +582,6 @@ The 3 airports in New York seem to run efficiently.
 * EWR: 25.5% Arrival Delay and 24.5% Departure Delay
 * JFK: 22.9% Arrival Delay and 20% Departure Delay
 * LGA: 22.3% Arrival Delay and 18.8% Departure Delay  
-
 National average: 26.1% Arrival Delay and 25% Departure Delay   
  
 ```{r, echo=FALSE}
@@ -612,9 +611,7 @@ Assumption checks:
 * Outliers - There are a few outliers, as indicated by points with Cook's distance values.
 
 **Do flight delays occur due to the origin of the airport?**
-
-Origins:
-For the origin, the linear model shows a relationship for each of the three origin flights in NYC, as they are all statistically significant with p-values less than 0.05. EWR leading to 9 minutes of delays, JFK and LFA arrive 3 minutes early. However, the origins only explain less that 1% of the delays, meaning they are not a major factor in explaining the data alone.
+  For the origin, the linear model shows a relationship for each of the three origin flights in NYC, as they are all statistically significant with p-values less than 0.05. EWR leading to 9 minutes of delays, JFK and LFA arrive 3 minutes early. However, the origins only explain less that 1% of the delays, meaning they are not a major factor in explaining the data alone.
 
 
 #### Q5: Are flight delays more likely during the holidays?
@@ -799,19 +796,38 @@ resamples(list(M1 = cv_m1, M2 = cv_m2)) %>% summary()
 
 
 ## Results & Discussion
-- Results presented w/ interpretation in context
-- Links results back to original questions/objectives.
-- Discuss limitations, implications, potential real-world impact
-- Offer thoughtful insights supported by evidence
+
+## Question 1:
+  Destination serves as a significant predictor coming for its extremely low P-scores. However they currently cannot be used a predictor as its R^2 values are extremely low. This means that although significant, the current results cannot describe the variability of the results. A possible way to increase the R^2 score is to simply train on more data than what we have currently.
+
+## Question 2:
+  Results from the linear regression model reveals that months can be significant predictors for flight delay. Although having significance, it has the same issue as destination where the R^2 values of each month are extremely low. Therefore they are unable to explain the variability of the model. This may be because months follow similarly to seasons, holidays, and general trends that come from the year. 
+  
+## Question 3: 
+  Both seasons and weather weather conditions are shown to be significant predictors for flight delay. Specifically in the summer where it is hotter and generally people go on vacation with either family or friends. Where summer is show to increase average flight delay by 12 minutes per unit. Furthermore, as seasons are correlated with weather, we can draw that the heavier the rain results in higher flight delays. This can be attributed in the real world through rain causing delays on the ground floor. 
+
+## Question 4:
+  From the regression models applied onto the data, we found that the three origin airports in New York City all show as significant predictors for flight delay. Each having their corresponding amounts of delay in minutes. While having low P-scores, their R^2 are nearly 0, meaning that the model cannot explain its variability.
+
+## Question 5:
+  As a result of applying models onto specific holidays of the year, we cannot conclude that holidays are a significant predictor of flight delays due to its low R^2 as well as extremely high RMSE value. This combination means that we will fail to reject the null hypothesis.
+  
+## Conclusion
+  In the finaly anaylsis, we were able to confirm that there were in fact various factors that can be used to predictor flight delay. These include, origin airport, destination, weather, and season. However, due to the size of our data and lack of data, we ran into an issue of low explainability in regards to the models variability. Therefore, we cannot use the current models results as an accurate predictor. Some ways to potentially increase our R^2 values include, predicting on more data, transforming our data to reveal any non-linear trends, as well as better suited algorithms and models.
+
+
+## Limitations
+
+  While trying to answer these questions, we have run into various limitations that prevent us from fully gaining an answer. Although the datasets provides data to a great extent, it still is not enough data as a whole. The dataset only pertains to NYC while there are the other 49 states unaccounted for. Furthermore, this limits us to only New York's airlines, preventing us to anaylze possible predictors for airlines across the world. Additionally, the dataset omits various crucial variables about flights. Flights with N/A values contain no descriptive reason to the cancellation. This exclusion of data can cause omission bias into the models. Ultimately, regardless of the amount of data we have on these flights, it is truly not enough data to create concrete and feasible conclusions. 
 
 
 ## Team Member Contributions
 
-* Vincent Chau - Team leader, set up github, planned what to do, additional models, conclusions, worked on final rmd.
+* Vincent Chau - Team leader, set up github, planned what to do, additional models, conclusions,limitations, worked on final rmd.
 * Christie Wong - Worked on data cleaning/EDA, worked on modeling for questions one and two, worked on final rmd.
 * Jimmy Ieng - Worked on data cleaning/EDA, worked on modeling for questions three and four worked on final rmd.
 * Arsenii Vasilev - Worked on EDA and modeling for question five, worked on final rmd. 
 
-Link to Github Repo: 
+**Link to Github Repo**: 
 
 
