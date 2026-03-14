@@ -2,19 +2,41 @@
 title: "Final Project Report"
 author: "Group 5 - VCAJ"
 date: "2026-03-13"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-
 ## Project Description
-- Clearly defines primary research questions/objectives
-- Project background and motivation
-- Importance/relevance of problem
-- Outlines expected outcomes, hypotheses, or analytical goals
+
+  When traveling through airlines, there are various reasons to why the flight may be delayed. Whether the weather conditions are inadequate, the day you are flying out is the busiest, the destination airport may be packed and inefficient, anything can be a reason of delay. In our analysis, we will try and analyze a variety of these factors to see if there are any predictors for flight delay. In today's age flights are crucial moving the world forward. The world's most influential powers rely on aviation to visit various places for important business. Important resources and materials being sent via airlines each day, war relief to life saving organs. Any delays in these materials may be the line between life and death for people. Finding a plausible predictor for flight delays may drastically improve the efficiency of flights for millions of flyers each day.
+  
+## Questions we will be answering:
+  
+- Q1: Do flight delays occur due to destination or region?
+  H[0]: Yes, destination/region does affect flight delay.
+  H[a]: No, destination/region does not affect flight delay.
+  
+- Q2: Do certain months have an effect on flight delays?
+  H[0]: Yes, certain months do affect flight delay.
+  H[a]: No, certain months do not affect flight delay.
+  
+- Q3: Do specific weather conditions and seasons delay flights more than others?
+  H[0]: Yes, specific weather conditions do affect flight delay.
+  H[a]: No, specific weather conditions do not affect flight delay.
+  
+- Q4: Do flight delays occur due to the origin of the airport?
+  H[0]: Yes, origin of the airport does affect flight delay.
+  H[a]: No, origin of the airport does not affect flight delay.
+  
+- Q5: Do flight delays occur due to specific holidays?
+  H[0]: Yes, specific holidays do affect flight delay.
+  H[a]: No, specific holidays do affect flight delay.
+
 
 ## Data Description
 
@@ -137,46 +159,6 @@ grid.arrange(b1, b2, ncol = 2)
   
   We decided to look at how the top 5 busiest destinations compared to actual destinations with the most amount of their flights delayed. For arrival delays, CAE, OKC, TUL, JAC, and TYS had the highest percentages of their flights delayed, ranging from about 40% to 65%. For departure delays, JAC, SBN, CAE, TUL, and OKC had the highest percentages of their flights delayed, ranging from 40% to 52%. These airports were also not that busy or popular as they only had a few hundred flights the entirety of 2013 from NYC, yet a large proportion of their flights were delayed in comparison to the busiest airports. 
   
-```{r, echo=FALSE}
-#Checking the Average arrival delay of destinations with top 20 airports
-top_dest <- flights %>%
-  group_by(dest) %>%
-  summarize(avg_arr_delay = mean(arr_delay, na.rm = TRUE),
-            avg_dep_delay = mean(dep_delay, na.rm = TRUE)) %>%
-  slice_max(avg_arr_delay, n = 20)
-
-bar_1 <- ggplot(top_dest, aes(x = reorder(dest, avg_arr_delay), y = avg_arr_delay, fill = dest)) +
-  geom_col() +
-  coord_flip() +
-  labs(x = "Destination", y = "Average Arrival Delay (min)") +
-  theme_minimal() +
-  guides(fill = "none")
-
-#compare the departure delay with the destinations with the highest arrival delay
-bar_2 <- ggplot(top_dest, aes(x = reorder(dest, avg_arr_delay), y = avg_dep_delay, fill = dest)) +
-  geom_col() +
-  coord_flip() +
-  labs(x = "Destination", y = "Average Departure Delay (min)") +
-  theme_minimal() +
-  guides(fill = "none")
-
-grid.arrange(bar_1,bar_2, ncol = 2)
-```
-
-```{r, echo=FALSE}
-dest_lm_arr <- lm(arr_delay ~ dest ,cleaned_weather_flights)
-
-summary(dest_lm_arr)
-plot(dest_lm_arr)
-```
-Assumption checks:
-* Linearity - red line is a straight line, meaning there is a linear relationship.
-* Normality - not perfectly distributed, but most is distributed on the line, implying there are extreme outliers.
-* Constant Variance - shows a small upward trend for the second half of the graph; there is slight heteroscedasticity in the data.
-* Outliers - There are a few outliers, as indicated by points with Cook's distance values.  
-  
-Destinations:
-  Based on the linear model, although some destinations are not statistically significant, destinations do play a role in flight delays. However, when looking at R^2, we see it explains only 1% of the variance, indicating that destinations are not a major factor in determining flight delays alone.
   
 ```{r echo = FALSE}
 # west - wash, oregon, cali, nev, utah, alaska, hawaii, montana, wy, colorado
@@ -784,10 +766,11 @@ Two linear regression models were compared using 5-fold cross-validation. The mo
 
 ## Team Member Contributions
 
-* Vincent Chau - 
-* Christie Wong - 
-* Jimmy Ieng - 
-* Arsenii Vasilev - 
+* Vincent Chau - Team leader, set up github, planned what to do, additional models, conclusions, worked on final rmd.
+* Christie Wong - Worked on data cleaning/EDA, worked on modeling for questions one and two, worked on final rmd.
+* Jimmy Ieng - Worked on data cleaning/EDA, worked on modeling for questions three and four worked on final rmd.
+* Arsenii Vasilev - Worked on EDA and modeling for question five, worked on final rmd. 
+
 
 
 
