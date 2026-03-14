@@ -22,6 +22,16 @@ knitr::opts_chunk$set(echo = TRUE)
   While working on the project, some limitations were encountered. Our first limitation was that we only had data from 2013, which means our dataset is limited to one year and includes only flights departing from NYC, so we can only analyze flights in NYC rather than flights across the whole country. One last limitation is that important data may have been missing or variables omitted.
 
 ```{r include = FALSE}
+#install.packages("nycflights13")
+#install.packages("tidyverse")
+#install.packages("lubridate")
+#install.packages("boot")
+#install.packages("gridExtra")
+#install.packages("ggdendro")
+#install.packages("ggrepel")
+```
+
+```{r include = FALSE}
 library(nycflights13)
 library(tidyverse)
 library(dplyr)
@@ -29,6 +39,8 @@ library(ggplot2)
 library(lubridate)
 library(boot)
 library(gridExtra)
+library(ggdendro)
+library(ggrepel)
 ```
 
 ```{r include = FALSE}
