@@ -53,9 +53,11 @@ knitr::opts_chunk$set(echo = TRUE)
 #install.packages("gridExtra")
 #install.packages("ggdendro")
 #install.packages("ggrepel")
+#install.packages("caret")
 ```
 
 ```{r include = FALSE}
+library(caret)
 library(nycflights13)
 library(tidyverse)
 library(dplyr)
@@ -186,6 +188,14 @@ summary(lm(dep_delay ~ region, data = region_data))
 
 not_canceled <- flights %>%
   filter(!is.na(dep_delay), !is.na(arr_delay))
+
+inc_region <- cleaned_weather_flights |>
+  mutate(region = case_when(dest %in% west ~ "West",
+                            dest %in% southwest ~ "Southwest",
+                            dest %in% midwest ~ "Midwest",
+                            dest %in% northeast ~ "Northeast",
+                            dest %in% southeast ~ "Southeast",
+                            dest %in% other ~ "Other"))
 
 not_canceled <- inner_join(not_canceled, inc_region)
 
@@ -364,6 +374,12 @@ Graph_2 <- ggplot(Avg_delay_per_rain, aes(x = precip_bin)) +
   coord_flip()
 
 grid.arrange(Graph_1, Graph_2, ncol = 2)
+
+monthly_flights <- not_canceled %>%
+  group_by(month) %>%
+  summarise(avg_dep_delay = mean(dep_delay),
+            avg_arr_delay = mean(arr_delay),
+            number_flights = n())
 
 monthly_weather <- weather %>%
   group_by(month) %>%
