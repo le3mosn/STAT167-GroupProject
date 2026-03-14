@@ -9,12 +9,32 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-
 ## Project Description
-- Clearly defines primary research questions/objectives
-- Project background and motivation
-- Importance/relevance of problem
-- Outlines expected outcomes, hypotheses, or analytical goals
+
+  When traveling through airlines, there are various reasons to why the flight may be delayed. Whether the weather conditions are inadequate, the day you are flying out is the busiest, the destination airport may be packed and inefficient, anything can be a reason of delay. In our analysis, we will try and analyze a variety of these factors to see if there are any predictors for flight delay. In today's age flights are crucial moving the world forward. The world's most influential powers rely on aviation to visit various places for important business. Important resources and materials being sent via airlines each day, war relief to life saving organs. Any delays in these materials may be the line between life and death for people. Finding a plausible predictor for flight delays may drastically improve the efficiency of flights for millions of flyers each day.
+  
+## Questions we will be answering:
+  
+- Q1: Do flight delays occur due to destination or region?
+  H[0]: Yes, destination/region does affect flight delay.
+  H[a]: No, destination/region does not affect flight delay.
+  
+- Q2: Do certain months have an effect on flight delays?
+  H[0]: Yes, certain months do affect flight delay.
+  H[a]: No, certain months do not affect flight delay.
+  
+- Q3: Do specific weather conditions and seasons delay flights more than others?
+  H[0]: Yes, specific weather conditions do affect flight delay.
+  H[a]: No, specific weather conditions do not affect flight delay.
+  
+- Q4: Do flight delays occur due to the origin of the airport?
+  H[0]: Yes, origin of the airport does affect flight delay.
+  H[a]: No, origin of the airport does not affect flight delay.
+  
+- Q5: Do flight delays occur due to specific holidays?
+  H[0]: Yes, specific holidays do affect flight delay.
+  H[a]: No, specific holidays do affect flight delay.
+
 
 ## Data Description
 
@@ -733,10 +753,11 @@ Based on all the cross validation sets the model with the best predictive perfor
 
 ## Team Member Contributions
 
-* Vincent Chau - 
-* Christie Wong - 
-* Jimmy Ieng - 
-* Arsenii Vasilev - 
+* Vincent Chau - Team leader, set up github, planned what to do, additional models, conclusions, worked on final rmd.
+* Christie Wong - Worked on data cleaning/EDA, worked on modeling for questions one and two, worked on final rmd.
+* Jimmy Ieng - Worked on data cleaning/EDA, worked on modeling for questions three and four worked on final rmd.
+* Arsenii Vasilev - Worked on EDA and modeling for question five, worked on final rmd. 
+
 
 
 
