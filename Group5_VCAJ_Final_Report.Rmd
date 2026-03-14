@@ -658,7 +658,7 @@ h2 <- ggplot(holiday_delays, aes(x = reorder(holiday_period, -percent_dep_delay)
 
 grid.arrange(h1, h2, ncol = 2)
 ```
-
+New Year's day has higher probability of arrival delays and period from Christmas to New Year's Eve has higher probability of departure delays. Based on that we can say that delays do happen more often during the winter holiday season.
 ```{r}
 holiday_long <- holiday_delays %>%
   select(holiday_period, percent_arr_delay, percent_dep_delay) %>%
@@ -680,8 +680,46 @@ ggplot(holiday_long, aes(x = holiday_period, y = percent, fill = delay_type)) +
   theme_minimal() +
   theme(plot.title = element_text(size = 10))
 ```
+Here we can see that only on New Year's arrival delays happen significantly more often than departure delays.
+```{r}
+holiday_model_data <- holiday_dates %>%
+  mutate(
+    holiday = ifelse(holiday_period == "Non-Holiday", 0, 1),
+    holiday_period = factor(holiday_period,
+                            levels = c("Non-Holiday", "New Year's",
+                                       "Memorial Day", "Independence Day",
+                                       "Thanksgiving", "Christmas/NYE"))
+  ) %>%
+  drop_na(dep_delay)
+
+m1 <- lm(dep_delay ~ holiday, data = holiday_model_data)
+
+# Main: specific holiday periods
+m2 <- lm(dep_delay ~ holiday_period, data = holiday_model_data)
+
+summary(m1)
+summary(m2)
+```
 
 
+
+```{r}
+model_metrics <- function(model, label) {
+  tibble(
+    Model  = label,
+    R2     = summary(model)$r.squared,
+    Adj_R2 = summary(model)$adj.r.squared,
+    RMSE   = sqrt(mean(residuals(model)^2)),
+    AIC    = AIC(model)
+  )
+}
+
+bind_rows(
+  model_metrics(m1, "M1: Binary Holiday"),
+  model_metrics(m2, "M2: Specific Holidays")
+)
+```
+Two linear regression models were built to see if holidays are a good predictor of the flight delays. M1 considered only holiday and non-holiday seasons and M2 took each holiday into account besides the non-holiday period. Based on extremely R^2 values and high RMSE it is clear that holidays is not a good predictor of arrival or departure delays.
 ## Model Implementation & Evaluation
 - Uses appropriate model validation strategies (cross-validation and/or validation set approach)
 - Employ relevant + justified performance metrics
@@ -719,7 +757,20 @@ cv_result_season
 
 Based on all the cross validation sets the model with the best predictive performance seems to be the weather condition model as it has the lowest MSE of 1943.
 
+### CV holidays
+```{r}
+set.seed(42)
+cv_ctrl <- trainControl(method = "cv", number = 5)
 
+cv_m1 <- train(dep_delay ~ holiday,
+               data = holiday_model_data, method = "lm", trControl = cv_ctrl)
+
+cv_m2 <- train(dep_delay ~ holiday_period,
+               data = holiday_model_data, method = "lm", trControl = cv_ctrl)
+
+resamples(list(M1 = cv_m1, M2 = cv_m2)) %>% summary()
+```
+Two linear regression models were compared using 5-fold cross-validation. The model using specific holiday periods performed slightly better than the binary holiday model, but both models had extremely low explanatory power. 
 
 
 ## Results & Discussion
