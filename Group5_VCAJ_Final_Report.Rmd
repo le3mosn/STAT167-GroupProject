@@ -58,7 +58,7 @@ cleaned_weather_flights <- drop_na(cleaned_weather_flights)
 - Address model assumptions and how they are assessed
 - Demonstrates depth in connecting methods to research questions
 
-#### Q1. Do popular destinations or vacation spots mean more flight delays?
+#### Q1: Do popular destinations or vacation spots mean more flight delays?
 
 ```{r echo = FALSE}
 dest_delays <- cleaned_weather_flights |>
@@ -159,7 +159,7 @@ summary(lm(dep_delay ~ region, data = region_data))
   Linear regression models were used to further analyze the relationship between destinations and flight delays. Because there are more than 100 unique destinations in the dataset, each airport was grouped into one of 6 geographic regions within U.S. territory being the Midwest, Northeast, Southeast, Southwest, West, and Other( includes Puerto Rico and the Virgin Islands). Our results showed that all regions significantly differed from the Midwest, except for the Southeast region in arrival delays. Overall, destination region is statistically significant and affects delays in both models, but it is a weak predictor on its own as the R-squared values show that less than 1% of the variation in delays can be explained by destination region.
 
 
-#### Q2. Do certain months have an effect on flight delays?
+#### Q2: Do certain months have an effect on flight delays?
 
 ```{r echo = FALSE}
 month_delays <- cleaned_weather_flights |>
@@ -201,8 +201,10 @@ summary(lm(dep_delay ~ factor(month), data = cleaned_weather_flights))
 
   Linear regression models were used to analyze the relationship between month and flights delays in arrivals and departures. For the model on arrival delays, February, March, and August did not have a significant difference from January. Overall, like with the models for destination region, month is a statistically significant variable that affects delays; however it can only explain 1-2% of the variation in delays due to its low r-squared values. Months is a relatively weak predictor on its own, and this can be due to how multiple factors along with months can influence delays at the same time. With months, there may be seasons, holidays, or weather conditions at play.
 
-**Q.3** Do specific weather conditions and seasons delay flights more than others?
-  ```{r, echo=FALSE}
+#### Q3: Do specific weather conditions and seasons delay flights more than others?
+
+#---------------------------Seasons-----------------------------------
+```{r, echo=FALSE}
 #Checking the percentage of flights by Seasons
 #grouping months into seasons
 flights_season <- cleaned_weather_flights %>%
@@ -228,6 +230,7 @@ Percent_delay_by_Seasons
 #Winter: 26.2% Arrival Delay and 22.2% Departure Delay
 #Fall: 15.7% Arrival Delay and 14.7% Departure Delay
 ```
+
 #---------------------------looking at the linear model-----------------------------------
 
 ```{r,echo=FALSE}
@@ -236,16 +239,16 @@ summary(MLR_season_arr_delay)
 plot(MLR_season_arr_delay)
 ```
 Assumption checks:
-  linearity - red line is horizontal, meaning there us a linear relationship
-Normality - not perfectly distributed, but most is distributed on the line, implying there are extreme outliers
-Constant Variance - shows a horizontal line, meaning the data is homoscedastic
-Outliers - There are a few outliers as there are points outside Cook's distance.
+* Linearity - red line is horizontal, meaning there us a linear relationship
+* Normality - not perfectly distributed, but most is distributed on the line, implying there are extreme outliers
+* Constant Variance - shows a horizontal line, meaning the data is homoscedastic
+* Outliers - There are a few outliers as there are points outside Cook's distance.
 
-Based on the on the linear regression model, the seasons are a major factor as all have a p-value < 0.05
-Fall: avgs -1 min delays
-Spring: avgs 8 min delay
-Summer: avgs 14 min delay
-Winter: avgs 10 min delay
+Based on the on the linear regression model, the seasons are a major factor as all have a p-value < 0.05.
+* Fall: avgs -1 min delays
+* Spring: avgs 8 min delay
+* Summer: avgs 14 min delay
+* Winter: avgs 10 min delay
 The fall season may be the best to fly at.
 
 ```{r,echo=FALSE}
@@ -255,17 +258,12 @@ plot(MLR_season_dep_delay)
 ```
 
 Assumption checks:
-linearity - red line is horizontal, meaning there us a linear relationship
-Normality - not perfectly distributed, but most is distributed on the line, implying there are extreme outliers
-Constant Variance - shows a horizontal line, meaning the data is homoscedastic
-Outliers - There are a few outliers as there are points outside Cook's distance.
+* Linearity - red line is horizontal, meaning there us a linear relationship
+* Normality - not perfectly distributed, but most is distributed on the line, implying there are extreme outliers
+* Constant Variance - shows a horizontal line, meaning the data is homoscedastic
+* Outliers - There are a few outliers as there are points outside Cook's distance.
 
-When looking at the linear model of the rain & visibility on the average mines of arrival delays it seems like rain and visibility has an effect to flight delays as the p-value <0.05, however they may not be significant as they both only explain 2% of the data
-
-Also let it be know that in the bin[0.9,1.2) has a p-value >0.05, meaning that this area is not statistically significant, meaning there may not be enough evidence to conclude the association with delays in that category
-
-For visibility, for every 1-mile increase in visibility, delays decrease by 2 minutes.
-For humidity it is statistically significant however its effects are small compared to the other factors.
+  When looking at the linear model of the rain & visibility on the average mines of arrival delays it seems like rain and visibility has an effect to flight delays as the p-value <0.05, however they may not be significant as they both only explain 2% of the data. Also let it be known that in the bin[0.9,1.2) has a p-value >0.05, meaning that this area is not statistically significant, meaning there may not be enough evidence to conclude the association with delays in that category. For visibility, for every 1-mile increase in visibility, delays decrease by 2 minutes. For humidity, it is statistically significant however its effects are small compared to the other factors.
 
 #------------------------------------------Weather Conditions------------------------------------------
 
@@ -319,13 +317,14 @@ Graph_2 <- ggplot(Avg_delay_per_rain, aes(x = precip_bin)) +
 
 grid.arrange(Graph_1, Graph_2, ncol = 2)
 ```
+
 0.0 - 0.3 = barely rain: 23.6% Arrival Delay and 21.3% Departure Delay
 0.3 - 0.6 = little rain: 60.5% Arrival Delay and 50.5% Departure Delay
 0.6 - 0.9 = regular rain: 73.9% Arrival Delay and 45.6% Departure Delay
 0.9 - 1.2 = heavy rain: 45% Arrival Delay and 50% Departure Delay
 1.2 above = very heavy rain: 66.6% Arrival Delay and 88.8% Departure Delay
 
-Note: it seems like although there is a relationship with higher rain and delays, in the heavy rain category it has less delays than the rest
+Note: it seems like although there is a relationship with higher rain and delays, in the heavy rain category it has less delays than the rest.
 
 ```{r,echo=FALSE}
 #By visibility
@@ -356,7 +355,7 @@ Graph2 <- ggplot(Avg_delay_per_vis , mapping = aes(x = visib)) +
 grid.arrange(Graph1, Graph2, ncol = 2)
 #Note: based on the graph there is a correlation to delays and visibility however at the very low visibility there are some variables that are not high, probably due to not enough data/outliers
 ```
-Note: based on the graph there is a correlation to delays and visibility however at the very low visibility there are some variables that are not high, probably due to not enough data/outliers
+Note: based on the graph there is a correlation to delays and visibility however at the very low visibility there are some variables that are not high, probably due to not enough data/outliers.
 
 ```{r,echo=FALSE}
 #By Temp
@@ -390,7 +389,7 @@ seasons_avg_temp <- flights_season %>% group_by(season) %>% summarise(
 
 seasons_avg_temp
 ```
-Temperature can be grouped with season, as the delays for season & temp are similar. Temperature is strongly correlated with seasons, so including both in the same model may create redundancy.
+  Temperature can be grouped with season, as the delays for season & temp are similar. Temperature is strongly correlated with seasons, so including both in the same model may create redundancy.
 
 ```{r,echo=FALSE}
 #By humidity
@@ -424,18 +423,14 @@ weather_lm_arr <- lm(arr_delay ~ precip_bin + visib + humid ,flights_rain)
 summary(weather_lm_arr)
 plot(weather_lm_arr)
 ```
+
 Assumption checks:
-  linearity - red line is a straight line, meaning there is a linear relationship
-Normality - not perfectly distributed, but most is distributed on the line, implying there are extreme outliers
-Constant Variance - shows a small upward trend; there is slight heteroscedasticity in the data
-Outliers - There are a few outliers, as indicated by points with Cook's distance values.
+* Linearity - red line is a straight line, meaning there is a linear relationship
+* Normality - not perfectly distributed, but most is distributed on the line, implying there are extreme outliers
+* Constant Variance - shows a small upward trend; there is slight heteroscedasticity in the data
+* Outliers - There are a few outliers, as indicated by points with Cook's distance values.
 
-When looking at the linear model of the rain & visibility on the average mines of arrival delays it seems like rain and visibility has an effect to flight delays as the p-value <0.05, however they may not be significant as they both only explain 2% of the data
-
-Also let it be know that in the bin[0.9,1.2) has a p-value >0.05, meaning that this area is not statistically significant, meaning there may not be enough evidence to conclude the association with delays in that category
-
-For visibility it seems like for every mile visibility increase the delays decrease by 2 minutes
-For humidity it is statistically significant however its effects are small compared to the other factors
+  When looking at the linear model of the rain & visibility on the average mines of arrival delays it seems like rain and visibility has an effect to flight delays as the p-value <0.05, however they may not be significant as they both only explain 2% of the data. Also let it be known that in the bin[0.9,1.2) has a p-value >0.05, meaning that this area is not statistically significant, meaning there may not be enough evidence to conclude the association with delays in that category. For visibility, it seems like for every mile visibility increase the delays decrease by 2 minutes. For humidity, it is statistically significant however its effects are small compared to the other factors
 
 ```{r,echo=FALSE}
 weather_lm_dep <- lm(dep_delay ~ precip_bin + visib + humid ,flights_rain)
@@ -443,20 +438,14 @@ weather_lm_dep <- lm(dep_delay ~ precip_bin + visib + humid ,flights_rain)
 summary(weather_lm_dep)
 plot(weather_lm_dep)
 ```
+
 Assumption checks:
-linearity - red line is a straight line, meaning there is a linear relationship
-Normality - not perfectly distributed, but most is distributed on the line, implying there are extreme outliers
-Constant Variance - shows a small upward trend; there is slight heteroscedasticity in the data
-Outliers - There are a few outliers, as indicated by points with Cook's distance values.
+* Linearity - red line is a straight line, meaning there is a linear relationship
+* Normality - not perfectly distributed, but most is distributed on the line, implying there are extreme outliers
+* Constant Variance - shows a small upward trend; there is slight heteroscedasticity in the data
+* Outliers - There are a few outliers, as indicated by points with Cook's distance values.
 
-When looking at the linear model of the rain & visibility on the average minutes of departure delays, it seems like rain and visibility have an effect on flight delays as the p-value <0.05, they may not be significant as they both only explain 1% of the data
-
-Once again, the bin[0.9,1.2) has a p-value >0.05, meaning that this area is not statistically significant, meaning there may not be enough evidence to conclude the association with delays in that category
-
-For visibility, it seems that for every mile visibility increases, the delays decrease by 1.8 minutes
-For humidity, it is statistically significant; however, its effects are small compared to the other factors
-
-The reason for the bin[0.9,1.2) has a p-value >0.05 is most likely due to the sample size being way too small, as the bin has fewer than 10 flights for both arrival and departure delay
+  When looking at the linear model of the rain & visibility on the average minutes of departure delays, it seems like rain and visibility have an effect on flight delays as the p-value <0.05, they may not be significant as they both only explain 1% of the data. Once again, the bin[0.9,1.2) has a p-value >0.05, meaning that this area is not statistically significant, meaning there may not be enough evidence to conclude the association with delays in that category. For visibility, it seems that for every mile visibility increases, the delays decrease by 1.8 minutes. For humidity, it is statistically significant; however, its effects are small compared to the other factors. The reason for the bin[0.9,1.2) has a p-value >0.05 is most likely due to the sample size being way too small, as the bin has fewer than 10 flights for both arrival and departure delay.
 
 ```{r,echo=FALSE}
 Percent_delay_by_Seasons %>%
@@ -482,9 +471,10 @@ scale_y_continuous(labels = scales::percent)
 *Do specific weather conditions and seasons delay flights more than others?*
   Both seasons and weather have statistically significant effects on flight delays. Flights in the summer are way worse than flights in fall, which seems to be like the best time to fly. When looking at the weather conditions, we can see that the temperature strongly correlates with the season, and the rain and visibility are evident. We can see that the more rain there is, the longer the delays in minutes, and that for each mile increase in visibility, the delay decreases by around 2 minutes. Humidity is also significant, but its effect on delays is very small. So weather and seasons may be a cause of delays, but their effects are not very big as they only explain a small variation of the data, with their explanation accounting for about 1-2% of the data, meaning there may be way more factors correlating with these variables in determining delays.
 
-**Q.4** Do flight delays occur due to their destination or the origin of the airport?
-  ```{r, echo=FALSE}
 
+#### Q4: Do flight delays occur due to their destination or the origin of the airport?
+
+```{r, echo=FALSE}
 #Checking the Average arrival delay of destinations with top 20 airports
 top_dest <- flights %>%
   group_by(dest) %>%
@@ -517,10 +507,10 @@ summary(dest_lm_arr)
 plot(dest_lm_arr)
 ```
 Assumption checks:
-  linearity - red line is a straight line, meaning there is a linear relationship
-Normality - not perfectly distributed, but most is distributed on the line, implying there are extreme outliers
-Constant Variance - shows a small upward trend for the second half of the graph; there is slight heteroscedasticity in the data
-Outliers - There are a few outliers, as indicated by points with Cook's distance values.
+* Linearity - red line is a straight line, meaning there is a linear relationship.
+* Normality - not perfectly distributed, but most is distributed on the line, implying there are extreme outliers.
+* Constant Variance - shows a small upward trend for the second half of the graph; there is slight heteroscedasticity in the data.
+* Outliers - There are a few outliers, as indicated by points with Cook's distance values.
 
 ```{r, echo=FALSE}
 
@@ -551,10 +541,10 @@ Nation_Average_delays <- percent_delay %>%
 #National average: 26.1% Arrival Delay and 25% Departure Delay   
  
 ``` 
-The 3 airports in New York seem to run efficiently
-EWR: 25.5% Arrival Delay and 24.5% Departure Delay
-JFK: 22.9% Arrival Delay and 20% Departure Delay
-LGA: 22.3% Arrival Delay and 18.8% Departure Delay  
+The 3 airports in New York seem to run efficiently.
+* EWR: 25.5% Arrival Delay and 24.5% Departure Delay
+* JFK: 22.9% Arrival Delay and 20% Departure Delay
+* LGA: 22.3% Arrival Delay and 18.8% Departure Delay  
 
 National average: 26.1% Arrival Delay and 25% Departure Delay   
  
@@ -564,11 +554,12 @@ origin_lm_dep <- lm(dep_delay ~ origin ,cleaned_weather_flights)
 summary(origin_lm_dep)
 plot(origin_lm_dep)
 ```
+
 Assumption checks:
-linearity - red line is horizontal, meaning there is a linear relationship
-Normality - not perfectly distributed, but most is distributed on the line, implying there are extreme outliers
-Constant Variance - shows a horizontal line, meaning the data is homoscedastic
-Outliers - There are a few outliers, as indicated by points with Cook's distance values outside the typical range.
+* Linearity - red line is horizontal, meaning there is a linear relationship
+* Normality - not perfectly distributed, but most is distributed on the line, implying there are extreme outliers.
+* Constant Variance - shows a horizontal line, meaning the data is homoscedastic
+* Outliers - There are a few outliers, as indicated by points with Cook's distance values outside the typical range.
 
 ```{r, echo=FALSE}
 origin_lm_arr <- lm(arr_delay ~ origin ,cleaned_weather_flights)
@@ -576,11 +567,12 @@ origin_lm_arr <- lm(arr_delay ~ origin ,cleaned_weather_flights)
 summary(origin_lm_arr)
 plot(origin_lm_arr)
 ``` 
+
 Assumption checks:
-  linearity - red line is horizontal, meaning there is a linear relationship
-Normality - not perfectly distributed, but most is distributed on the line, implying there are extreme outliers
-Constant Variance - shows a horizontal line, meaning the data is homoscedastic
-Outliers - There are a few outliers, as indicated by points with Cook's distance values.
+* Linearity - red line is horizontal, meaning there is a linear relationship
+* Normality - not perfectly distributed, but most is distributed on the line, implying there are extreme outliers
+* Constant Variance - shows a horizontal line, meaning the data is homoscedastic
+* Outliers - There are a few outliers, as indicated by points with Cook's distance values.
 
 **Do flight delays occur due to their destination or the origin of the airport?**
 Destinations:
@@ -589,8 +581,18 @@ Based on the linear model, although some destinations are not statistically sign
 Origins:
 For the origin, the linear model shows a relationship for each of the three origin flights in NYC, as they are all statistically significant with p-values less than 0.05. EWR leading to 9 minutes of delays, JFK and LFA arrive 3 minutes early. However, the origins only explain less that 1% of the delays, meaning they are not a major factor in explaining the data alone.
 
-#-------cross validation for all data sets----------
-#CV weather
+
+
+
+## Model Implementation & Evaluation
+- Uses appropriate model validation strategies (cross-validation and/or validation set approach)
+- Employ relevant + justified performance metrics
+- Clearly explains model performance + any tradeoffs
+- Considers model complexity, overfitting, model selection
+
+Cross validation was conducted on all the different factors.
+
+#### CV weather
 ```{r, echo=FALSE}
 weather_glm_arr <- glm(arr_delay ~ precip_bin + visib + humid, data = flights_rain)
 
@@ -598,7 +600,8 @@ cv_result_weather <- cv.glm(flights_rain,  weather_glm_arr, K = 10)$delta
 
 cv_result_weather
 ```
-#CV Origin
+
+#### CV Origin
 ```{r, echo=FALSE}
 origin_glm_arr <- glm(arr_delay ~ origin, data = cleaned_weather_flights)
 
@@ -606,7 +609,8 @@ cv_result_origin <- cv.glm(cleaned_weather_flights, origin_glm_arr, K = 10)$delt
 
 cv_result_origin
 ```
-#CV seasons
+
+#### CV seasons
 ```{r, echo=FALSE}
 season_glm_arr <- glm(arr_delay ~ season, data = flights_season)
 
@@ -616,12 +620,6 @@ cv_result_season
 ```
 
 Based on all the cross validation sets the model with the best predictive performance seems to be the weather condition model as it has the lowest MSE of 1943.
-
-## Model Implementation & Evaluation
-- Uses appropriate model validation strategies (cross-validation and/or validation set approach)
-- Employ relevant + justified performance metrics
-- Clearly explains model performance + any tradeoffs
-- Considers model complexity, overfitting, model selection
 
 ## Results & Discussion
 - Results presented w/ interpretation in context
