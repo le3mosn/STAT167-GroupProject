@@ -21,6 +21,7 @@ library(dplyr)
 library(ggplot2)
 library(lubridate)
 library(boot)
+library(gridExtra)
 ```
 
 ```{r}
@@ -50,81 +51,45 @@ cleaned_weather_flights <- drop_na(cleaned_weather_flights)
 
 
 
-**Q.1** How do holidays/popular vacation times affect delays?
+**Q.1** Does month affect delays?
 
 ```{r}
 month_delays <- cleaned_weather_flights |>
   group_by(month) |>
-  summarise(avg_arr = mean(arr_delay),
-            avg_dep = mean(dep_delay),
-            total = n(),
+  summarise(total = n(),
             total_arr_delayed = sum(arr_delay > 15),
             total_dep_delayed = sum(dep_delay > 15),
             percent_arr_delay = total_arr_delayed/total,
             percent_dep_delay = total_dep_delayed/total) |>
   arrange(month) |>
   mutate(abbre_month = c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"))
-
-# Months w/ most flights
-month_delays |> arrange(desc(total))
-
-# Months with the most departure delays on average
-month_delays |> arrange(desc(avg_dep))
-
-# Months w/ most arrival delays on average
-month_delays |> arrange(desc(avg_arr))
-
-# Months w/ high % of departure delays
-month_delays |> arrange(desc(percent_dep_delay))
-
-# Months w/ high % of arrival delays
-month_delays |> arrange(desc(percent_arr_delay))
-
-# Top 3 months w/ highest delays: July, June, December
-# Months with the most amount of flights: August, October, July
-# Flights mostly within the 26k - 28.5k range except for February with 23k flights
 ```
 
 ```{r}
-library(gridExtra)
-barplot1 <- ggplot(month_delays, aes(x = reorder(abbre_month, -month))) +
-  geom_col(aes(y = avg_dep, fill = avg_dep < 0), position = "dodge") +
-  labs(x = "Month", 
-       y = "Average Flight Delay (mins)",
-       title = "Average Departure Delay by Month") +
-  theme(legend.position = "none") +
-  coord_flip()
+month_graph_data <- month_delays |>
+  select(month, abbre_month, percent_arr_delay, percent_dep_delay) |>
+  pivot_longer(cols = c(percent_arr_delay, percent_dep_delay),
+               names_to = "delay_type",
+               values_to = "percent") |>
+  mutate(delay_type = recode(delay_type,
+                             "percent_arr_delay" = "Arr Delay",
+                             "percent_dep_delay" = "Dep Delay"))
 
-barplot2 <- ggplot(month_delays, aes(x = reorder(abbre_month, -month))) +
-  geom_col(aes(y = avg_arr, fill = avg_arr < 0), position = "dodge") +
-  labs(x = "Month", 
-       y = "Average Flight Delay (mins)",
-       title = "Average Arrival Delay by Month") +
-  coord_flip()
-
-grid.arrange(barplot1, barplot2, ncol = 2)
+ggplot(month_graph_data, aes(x = reorder(abbre_month, month), y = percent, fill = delay_type)) +
+  geom_col(position = "dodge") +
+  scale_y_continuous(labels = scales::percent_format()) +
+  labs(x = "Month",
+       y = "% of Flights Delayed",
+       fill = "Delay Type",
+       title = "% of Delayed Flights by Month")
 ```
 
+
+### Linear regression models
+
 ```{r}
-per_bar <- ggplot(month_delays, aes(x = reorder(abbre_month, -month))) +
-  geom_col(aes(y = percent_dep_delay, fill = percent_dep_delay > 0.27), position = "dodge") +
-  labs(x = "Month", 
-       y = "% of Flights Delayed",
-       title = "% of Depart Delayed Flights by Month") +
-  theme(legend.position = "none") +
-  scale_y_continuous(labels = scales::percent_format()) +
-  coord_flip()
-
-per_bar2 <- ggplot(month_delays, aes(x = reorder(abbre_month, -month))) +
-  geom_col(aes(y = percent_arr_delay, fill = percent_arr_delay > 0.28), position = "dodge") +
-  labs(x = "Month", 
-       y = "% of Flights Delayed",
-       title = "% of Arrival Delayed Flights by Month") +
-  theme(legend.position = "none") +
-  scale_y_continuous(labels = scales::percent_format()) +
-  coord_flip()
-
-grid.arrange(per_bar, per_bar2, ncol = 2)
+summary(lm(arr_delay ~ factor(month), data = cleaned_weather_flights))
+summary(lm(dep_delay ~ factor(month), data = cleaned_weather_flights))
 ```
 
 
@@ -132,43 +97,43 @@ grid.arrange(per_bar, per_bar2, ncol = 2)
 **Q.2** Do popular vacation locations mean an increase in flight delays?
 
 ```{r}
-dest_delay <- cleaned_weather_flights |>
+dest_delays <- cleaned_weather_flights |>
   group_by(dest) |>
   summarise(total_flights = n(),
             total_arr_delayed = sum(arr_delay > 15),
             total_dep_delayed = sum(dep_delay > 15),
             percent_arr_delay = total_arr_delayed/total_flights,
             percent_dep_delay = total_dep_delayed/total_flights)
-  
-dest_delay |> arrange(desc(total_flights))
-# lots of flights going into Atlanta (GA), Chicago (IL) and Los Angeles (LAX) in 2013
 
-dest_delay |> arrange(desc(percent_arr_delay))
-# CAE, OKC, TUL
+# top 5 destinations with the most flights in 2013
+busiest_dest_delay <- dest_delays |>
+  arrange(desc(total_flights)) |>
+  slice(1:5)
 
-dest_delay |> arrange(desc(percent_dep_delay))
-# JAC, SBN, CAE, TUL, OKC
-# Keep in mind JAC and SBN both have less than 25 flights
+g1 <- ggplot(busiest_dest_delay, mapping = aes(x = reorder(dest, -percent_arr_delay))) +
+  geom_col(aes(y = percent_arr_delay, fill = dest), position = "dodge") +
+  scale_y_continuous(labels = scales::percent_format()) +
+  labs(x = "Destination", 
+       y = "% of Flights Delayed",
+       title = "Arrival Delays in Top 5 Destinations") 
 
-# CAE: 63% arrival delay and 48% departure delay
-# OKC: 50% arrival delay and 43% departure delay
-# TUL: 48% arrival delay and 44% departure delay
+g2 <- ggplot(busiest_dest_delay, mapping = aes(x = reorder(dest, -percent_dep_delay))) +
+  geom_col(aes(y = percent_dep_delay, fill = dest), position = "dodge") +
+  scale_y_continuous(labels = scales::percent_format()) +
+  labs(x = "Destination", 
+       y = "% of Flights Delayed",
+       title = "Departure Delays in Top 5 Destinations")
 
-# Popular airport spots yet they seem to run pretty efficiently
-# ATL: 25% arrival delay and 20% departure delay
-# ORD: 23% arrival delay and 22% departure delay
-# LAX: 20% arrival delay and 17% departure delay
-
+grid.arrange(g1, g2, ncol = 2)
 ```
 
 ```{r}
 # Finding destinations with the most % of flights delayed (departure + arrival)
-
-top5_arr_delayed <- dest_delay |>
+top5_arr_delayed <- dest_delays |>
   arrange(desc(percent_arr_delay)) |>
   slice(1:5)
 
-top5_dep_delayed <- dest_delay |>
+top5_dep_delayed <- dest_delays |>
   arrange(desc(percent_dep_delay)) |>
   slice(1:5)
 
@@ -192,32 +157,39 @@ b2 <- ggplot(top5_dep_delayed, mapping = aes(x = reorder(dest, -percent_dep_dela
 grid.arrange(b1, b2, ncol = 2)
 ```
 
+### Linear Regression Models
 
 ```{r}
-# Comparing with delays from busiest locations
+# west - wash, oregon, cali, nev, utah, alaska, hawaii, montana, wy, colorado
+# Northeast - connect, maine, massa, new_ham, ny, penn, rhode, vermont
+# southwest - ari, new_mex, texas, ok
+# southeast - ala, ark, flo, ga, ky, la, maryland, nc, sc, tenn, tx, ok, west virginia, va
+# midwest - ill, indi, iowa, michi, minn, missouri, neb, ohio, wisconsin
 
-busiest_dest_delay <- dest_delay |>
-  arrange(desc(total_flights)) |>
-  slice(1:5)
+west = c("SEA", "PDX", "BUR", "LAX", "LGB", "OAK", "PSP", "SAN", "SFO", "SJC", "SMF", "SNA",
+         "LAS", "SLC", "ANC", "HNL", "BZN", "JAC", "DEN", "EGE", "HDN", "MTJ")
+southwest = c("PHX", "ABQ", "AUS", "DFW", "HOU", "IAH", "SAT", "OKC", "TUL")
+midwest = c("MDW", "ORD", "IND", "SBN", "DSM", "DTW", "GRR", "TVC", "MSP", "MCI",
+            "STL", "OMA", "CAK", "CLE", "CMH", "DAY", "MKE", "MSN")
+northeast = c("BDL", "BGR", "PWM", "ACK", "BOS", "MVY", "MHT", "ALB", "BUF", "ROC", "SYR",
+              "PHL", "PIT", "PVD", "BTV")
+southeast = c("BMH", "XNA", "EYW", "FLL", "JAX", "MCO", "MIA", "PBI", "RSW", "SRQ", "TPA",
+              "ATL", "SAV", "CVG", "LEX", "SDF", "MSY", "BWI", "AVL", "CLT", "GSO", "ILM",
+              "RDU", "BNA", "MEM", "TYS", "CAE", "CHS", "GSP", "MYR", "CRW", "CHO", "DCA",
+              "IAD", "ORF", "RIC")
+other = c("BQN", "PSE", "SJU", "STT")
 
-g1 <- ggplot(busiest_dest_delay, mapping = aes(x = reorder(dest, -percent_arr_delay))) +
-  geom_col(aes(y = percent_arr_delay, fill = dest), position = "dodge") +
-  scale_y_continuous(labels = scales::percent_format()) +
-  labs(x = "Destination", 
-       y = "% of Flights Delayed",
-       title = "Arrival Delays in Top 5 Destinations") 
-
-g2 <- ggplot(busiest_dest_delay, mapping = aes(x = reorder(dest, -percent_dep_delay))) +
-  geom_col(aes(y = percent_dep_delay, fill = dest), position = "dodge") +
-  scale_y_continuous(labels = scales::percent_format()) +
-  labs(x = "Destination", 
-       y = "% of Flights Delayed",
-       title = "Departure Delays in Top 5 Destinations")
-
-grid.arrange(g1, g2, ncol = 2)
-
+region_data <- cleaned_weather_flights |>
+  mutate(region = case_when(dest %in% west ~ "West",
+                            dest %in% southwest ~ "Southwest",
+                            dest %in% midwest ~ "Midwest",
+                            dest %in% northeast ~ "Northeast",
+                            dest %in% southeast ~ "Southeast",
+                            dest %in% other ~ "Other"))
+# linear model
+summary(lm(arr_delay ~ region, data = region_data))
+summary(lm(dep_delay ~ region, data = region_data))
 ```
-
 
 
 **Q.3** Do specific weather conditions and seasons delay flights more than others?

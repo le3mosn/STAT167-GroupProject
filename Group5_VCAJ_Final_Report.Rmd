@@ -18,28 +18,191 @@ knitr::opts_chunk$set(echo = TRUE)
 
 
 
-## Data Description & Preparation
-- Specifies datasets used + provides data source/link
-- Describes structure of data + variables involved
-- Identify variables relevant to research questions
-- Discusses any data limitations, missing values, cleaning steps
-- Explains integration approach if multiple datasets are used
+## Data Description
+
+  For our dataset, we used the “flights” and “weather” datasets from the “nycflights13” library. We decided that the important variables we wanted to look further into were month, day, year, destination, arrival delay, departure delay, temperature, precipitation, humidity, visibility, origin, and time. We decided to integrate the two datasets by the origin and time. Then we retained only the variables we considered important, as listed earlier, and used them to answer our questions. When looking at the dataset, we found some missing values, so we decided to remove any rows with NAs in any column. This reduced our observations from around 336k to 325k. 
+  While working on the project, some limitations were encountered. Our first limitation was that we only had data from 2013, which means our dataset is limited to one year and includes only flights departing from NYC, so we can only analyze flights in NYC rather than flights across the whole country. One last limitation is that important data may have been missing or variables omitted.
+
+```{r include = FALSE}
+library(nycflights13)
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(lubridate)
+library(boot)
+library(gridExtra)
+```
+
+```{r include = FALSE}
+#filtering flights with the important variables we chose
+Filtered_flights <- flights[, c("year", "month", "day", "dep_delay", "arr_delay", "dest", "origin", "time_hour")]
+Filtered_flights %>% count(year, month, day) %>% filter(n > 1)
+summary(Filtered_flights) # view(Filtered_flights)
+
+#filtering weather with the important variables we chose
+filtered_weather <- weather[,c(1,6,8,12,14,15)]
+summary(filtered_weather) # view(filtered_weather)
+
+#combining both filtered datasets by time_hour and origin
+cleaned_weather_flights <- inner_join(Filtered_flights, filtered_weather, by = c("origin", "time_hour"))
+cleaned_weather_flights <- drop_na(cleaned_weather_flights)
+```
 
 
-
-## Exploratory Data Analysis
+## Exploratory Data Analysis and Statistical Models
 - Visualizations w/ clear titles + labels
 - Examine trends, distributions, relationships
 - Interpret EDA results + connect them to research goals
 
-
-
-## Methodology & Analysis
 - Explain choice of analytical/modeling methods
 - Justify methods based on project goals + data type
 - Identify predictors + outcomes clearly
 - Address model assumptions and how they are assessed
 - Demonstrates depth in connecting methods to research questions
+
+#### Q1. Do popular destinations or vacation spots mean more flight delays?
+
+```{r echo = FALSE}
+dest_delays <- cleaned_weather_flights |>
+  group_by(dest) |>
+  summarise(total_flights = n(),
+            total_arr_delayed = sum(arr_delay > 15),
+            total_dep_delayed = sum(dep_delay > 15),
+            percent_arr_delay = total_arr_delayed/total_flights,
+            percent_dep_delay = total_dep_delayed/total_flights)
+
+# top 5 destinations with the most flights in 2013
+busiest_dest_delay <- dest_delays |>
+  arrange(desc(total_flights)) |>
+  slice(1:5)
+
+g1 <- ggplot(busiest_dest_delay, mapping = aes(x = reorder(dest, -percent_arr_delay))) +
+  geom_col(aes(y = percent_arr_delay, fill = dest), position = "dodge") +
+  scale_y_continuous(labels = scales::percent_format()) +
+  labs(x = "Destination", 
+       y = "% of Flights Delayed",
+       title = "Arrival Delays in Top 5 Destinations") 
+
+g2 <- ggplot(busiest_dest_delay, mapping = aes(x = reorder(dest, -percent_dep_delay))) +
+  geom_col(aes(y = percent_dep_delay, fill = dest), position = "dodge") +
+  scale_y_continuous(labels = scales::percent_format()) +
+  labs(x = "Destination", 
+       y = "% of Flights Delayed",
+       title = "Departure Delays in Top 5 Destinations")
+
+grid.arrange(g1, g2, ncol = 2)
+```
+ 
+  We hypothesized that airport destination would have an effect on flight delays, and we thought popular cities for vacation like Los Angeles may experience more delays due to the amount of planes flying in and out. We defined a popular or busy destination by their total number of flights. Based on the table above, there were many flights going into the airports: ATL, ORD, LAX, BOS, and MCO in 2013. This seems reasonable as they belong to states that many people like traveling or visiting to like Georgia, California, and Florida. 
+  The bar graph visualizes the percent of flights delayed for arrivals and departures from the top 5 busiest destinations which are the airports: ATL, ORD, LAX, MCO, and BOS. Flights were considered late if they had over 15 minutes of delay. Despite having many flights in 2013, these locations performed relatively well, with only about 17% to 25% of their flights experiencing arrival delays and 17% to 23% of flights experiencing departure delays.
+
+```{r echo = FALSE}
+# Finding destinations with the most % of flights delayed (departure + arrival)
+top5_arr_delayed <- dest_delays |>
+  arrange(desc(percent_arr_delay)) |>
+  slice(1:5)
+
+top5_dep_delayed <- dest_delays |>
+  arrange(desc(percent_dep_delay)) |>
+  slice(1:5)
+
+b1 <- ggplot(top5_arr_delayed, mapping = aes(x = reorder(dest, -percent_arr_delay))) +
+  geom_col(aes(y = percent_arr_delay), fill = "salmon", position = "dodge") +
+  scale_y_continuous(labels = scales::percent_format()) +
+  labs(x = "Destination", 
+       y = "% of Flights Delayed",
+       title = "Top 5 Destinations w/ Arrival Delays") +
+  theme(legend.position = "none")
+
+b2 <- ggplot(top5_dep_delayed, mapping = aes(x = reorder(dest, -percent_dep_delay))) +
+  geom_col(aes(y = percent_dep_delay), fill = "salmon", position = "dodge") +
+  scale_y_continuous(labels = scales::percent_format()) +
+  labs(x = "Destination",
+       y = "% of Flights Delayed",
+       title = "Top 5 Destinations w/ Departure Delays") +
+  theme(legend.position = "none")
+
+grid.arrange(b1, b2, ncol = 2)
+```
+  
+  We decided to look at how the top 5 busiest destinations compared to actual destinations with the most amount of their flights delayed. For arrival delays, CAE, OKC, TUL, JAC, and TYS had the highest percentages of their flights delayed, ranging from about 40% to 65%. For departure delays, JAC, SBN, CAE, TUL, and OKC had the highest percentages of their flights delayed, ranging from 40% to 52%. These airports were also not that busy or popular as they only had a few hundred flights the entirety of 2013 from NYC, yet a large proportion of their flights were delayed in comparison to the busiest airports. 
+  
+```{r echo = FALSE}
+# west - wash, oregon, cali, nev, utah, alaska, hawaii, montana, wy, colorado
+# Northeast - connect, maine, massa, new_ham, ny, penn, rhode, vermont
+# southwest - ari, new_mex, texas, ok
+# southeast - ala, ark, flo, ga, ky, la, maryland, nc, sc, tenn, tx, ok, west virginia, va
+# midwest - ill, indi, iowa, michi, minn, missouri, neb, ohio, wisconsin
+
+west = c("SEA", "PDX", "BUR", "LAX", "LGB", "OAK", "PSP", "SAN", "SFO", "SJC", "SMF", "SNA",
+         "LAS", "SLC", "ANC", "HNL", "BZN", "JAC", "DEN", "EGE", "HDN", "MTJ")
+southwest = c("PHX", "ABQ", "AUS", "DFW", "HOU", "IAH", "SAT", "OKC", "TUL")
+midwest = c("MDW", "ORD", "IND", "SBN", "DSM", "DTW", "GRR", "TVC", "MSP", "MCI",
+            "STL", "OMA", "CAK", "CLE", "CMH", "DAY", "MKE", "MSN")
+northeast = c("BDL", "BGR", "PWM", "ACK", "BOS", "MVY", "MHT", "ALB", "BUF", "ROC", "SYR",
+              "PHL", "PIT", "PVD", "BTV")
+southeast = c("BMH", "XNA", "EYW", "FLL", "JAX", "MCO", "MIA", "PBI", "RSW", "SRQ", "TPA",
+              "ATL", "SAV", "CVG", "LEX", "SDF", "MSY", "BWI", "AVL", "CLT", "GSO", "ILM",
+              "RDU", "BNA", "MEM", "TYS", "CAE", "CHS", "GSP", "MYR", "CRW", "CHO", "DCA",
+              "IAD", "ORF", "RIC")
+other = c("BQN", "PSE", "SJU", "STT")
+
+region_data <- cleaned_weather_flights |>
+  mutate(region = case_when(dest %in% west ~ "West",
+                            dest %in% southwest ~ "Southwest",
+                            dest %in% midwest ~ "Midwest",
+                            dest %in% northeast ~ "Northeast",
+                            dest %in% southeast ~ "Southeast",
+                            dest %in% other ~ "Other"))
+# linear model
+summary(lm(arr_delay ~ region, data = region_data))
+summary(lm(dep_delay ~ region, data = region_data))
+```
+  Linear regression models were used to further analyze the relationship between destinations and flight delays. Because there are more than 100 unique destinations in the dataset, each airport was grouped into one of 6 geographic regions within U.S. territory being the Midwest, Northeast, Southeast, Southwest, West, and Other( includes Puerto Rico and the Virgin Islands). Our results showed that all regions significantly differed from the Midwest, except for the Southeast region in arrival delays. Overall, destination region is statistically significant and affects delays in both models, but it is a weak predictor on its own as the R-squared values show that less than 1% of the variation in delays can be explained by destination region.
+
+
+#### Q2. Do certain months have an effect on flight delays?
+
+```{r echo = FALSE}
+month_delays <- cleaned_weather_flights |>
+  group_by(month) |>
+  summarise(total = n(),
+            total_arr_delayed = sum(arr_delay > 15),
+            total_dep_delayed = sum(dep_delay > 15),
+            percent_arr_delay = total_arr_delayed/total,
+            percent_dep_delay = total_dep_delayed/total) |>
+  arrange(month) |>
+  mutate(abbre_month = c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"))
+```
+
+```{r echo = FALSE}
+month_graph_data <- month_delays |>
+  select(month, abbre_month, percent_arr_delay, percent_dep_delay) |>
+  pivot_longer(cols = c(percent_arr_delay, percent_dep_delay),
+               names_to = "delay_type",
+               values_to = "percent") |>
+  mutate(delay_type = recode(delay_type,
+                             "percent_arr_delay" = "Arr Delay",
+                             "percent_dep_delay" = "Dep Delay"))
+
+ggplot(month_graph_data, aes(x = reorder(abbre_month, month), y = percent, fill = delay_type)) +
+  geom_col(position = "dodge") +
+  scale_y_continuous(labels = scales::percent_format()) +
+  labs(x = "Month",
+       y = "% of Flights Delayed",
+       fill = "Delay Type",
+       title = "% of Delayed Flights by Month")
+```
+
+  We hypothesized that months were likely to affect flight delays as vacation months like June and December are likely to experience more congestion than any other time of the year. Based on the bar graph, the flight delay rates for arrivals tended to be about the same or greater than the flight delay rates for departures between each month. December, July, and June were the top three months with the highest flight delay rates while September, October, and November had the lowest flight delay rates.
+
+```{r echo = FALSE}
+summary(lm(arr_delay ~ factor(month), data = cleaned_weather_flights))
+summary(lm(dep_delay ~ factor(month), data = cleaned_weather_flights))
+```
+
+  Linear regression models were used to analyze the relationship between month and flights delays in arrivals and departures. For the model on arrival delays, February, March, and August did not have a significant difference from January. Overall, like with the models for destination region, month is a statistically significant variable that affects delays; however it can only explain 1-2% of the variation in delays due to its low r-squared values. Months is a relatively weak predictor on its own, and this can be due to how multiple factors along with months can influence delays at the same time. With months, there may be seasons, holidays, or weather conditions at play.
+
 
 
 
