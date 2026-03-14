@@ -532,6 +532,16 @@ Avg_Origin_delays
 #JFK: 22.9% Arrival Delay and 20% Departure Delay
 #LGA: 22.3% Arrival Delay and 18.8% Departure Delay
 
+#gets the percentage of delays for each destination
+percent_delay <- cleaned_weather_flights |>
+  group_by(dest) |>
+  summarise(total_flights = n(),
+            total_arr_delayed = sum(arr_delay > 15),
+            total_dep_delayed = sum(dep_delay > 15),
+            percent_arr_delay = total_arr_delayed/total_flights,
+            percent_dep_delay = total_dep_delayed/total_flights)
+
+
 #compared to the nation average
 #using data from destinations to find national average
 Nation_Average_delays <- percent_delay %>% 
