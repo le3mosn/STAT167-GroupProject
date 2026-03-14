@@ -183,7 +183,24 @@ region_data <- cleaned_weather_flights |>
 # linear model
 summary(lm(arr_delay ~ region, data = region_data))
 summary(lm(dep_delay ~ region, data = region_data))
+
+not_canceled <- inner_join(not_canceled, inc_region)
+
+delay_dest <- not_canceled %>%
+  group_by(dest, region) %>%
+  summarise(avg_dep_delay = mean(dep_delay, na.rm = TRUE),
+                                 avg_arr_delay = mean(arr_delay, na.rm = TRUE))
+delay_dest_scaled <- scale(delay_dest[, c("avg_dep_delay", "avg_arr_delay")])
+km_fitted <- kmeans(x = delay_dest_scaled, centers = 5)
+delay_dest$cluster <- as.factor(km_fitted$cluster)
+ggplot(delay_dest, aes(x = avg_dep_delay, y = avg_arr_delay, color = cluster)) +
+  geom_point(size = 3) +
+  geom_text_repel(aes(label = region), size = 5) +
+  labs(title = "Destination Cluster Based Off Average Delay", x = "Average Departure Delay", y = "Average Arrival Delay")
+
+
 ```
+  Here we created a K-means cluster based off destinations. Here we first calculated the average departure delay as the x-axis, and the average arrival delay on the y-axis. Then we applied a scaling factor onto the values. Now having out scaled delay values, we applied a k-means clustering of 5 centers and plotted it onto a scatter plot. Here we used 4 clusters to view the varying groups of locations. From the graph, we can follow to the top right and observe that there generally is higher delay on average in the southwest part of the USA. This serves as a preliminary generally correlation between destination region and delay times.
   Linear regression models were used to further analyze the relationship between destinations and flight delays. Because there are more than 100 unique destinations in the dataset, each airport was grouped into one of 6 geographic regions within U.S. territory being the Midwest, Northeast, Southeast, Southwest, West, and Other( includes Puerto Rico and the Virgin Islands) to simplify and generalize our analysis. Our results showed that all regions significantly differed from the Midwest, except for the Southeast region in arrival delays. Overall, destination region is statistically significant and affects delays in both models, but it is a weak predictor on its own as the R-squared values show that less than 1% of the variation in delays can be explained by destination region.
 
 
@@ -344,6 +361,26 @@ Graph_2 <- ggplot(Avg_delay_per_rain, aes(x = precip_bin)) +
   coord_flip()
 
 grid.arrange(Graph_1, Graph_2, ncol = 2)
+
+monthly_weather <- weather %>%
+  group_by(month) %>%
+  summarize(avg_temp = mean(temp, na.rm = T),
+            avg_hum = mean(humid, na.rm = T),
+            avg_wind = mean(wind_speed, na.rm = T),
+            avg_precip = mean(precip, na.rm = T),
+            avg_press = mean(pressure, na.rm = T),
+            avg_vis = mean(visib, na.rm = T))
+
+joined_weather_delay <- inner_join(monthly_weather, monthly_flights)
+
+joined_weather_delay_scale <- scale(joined_weather_delay[, -1])
+
+matrix <- dist(joined_weather_delay_scale)
+
+cluster <- hclust(matrix, method = 'average')
+
+ggdendrogram(data = cluster) +
+  ggtitle("Average Linkage Clusters Between Average Weather To Average Delay")
 ```
 
 0.0 - 0.3 = barely rain: 23.6% Arrival Delay and 21.3% Departure Delay
@@ -352,7 +389,7 @@ grid.arrange(Graph_1, Graph_2, ncol = 2)
 0.9 - 1.2 = heavy rain: 45% Arrival Delay and 50% Departure Delay
 1.2 above = very heavy rain: 66.6% Arrival Delay and 88.8% Departure Delay
 
-Note: it seems like although there is a relationship with higher rain and delays, in the heavy rain category it has less delays than the rest.
+Note: it seems like although there is a relationship with higher rain and delays, in the heavy rain category it has less delays than the rest. Furthermore, the dengrogram describes clusters between average delay, as well as average weather conditions per month. They are then clustered via average linkage. This shows relations between seasons, where summer months like June and July have similar delay times as well as weather patterns. 
 
 ```{r,echo=FALSE}
 #By visibility
