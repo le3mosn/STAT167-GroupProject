@@ -554,7 +554,8 @@ holiday_delays <- holiday_dates %>%
 holiday_delays
 ```
 ```{r}
-# Comparing percentage of delays for each holiday and non-holidays on average
+library(gridExtra)
+# Comparing percentage of delays for each holday and non-holidays on average
 h1 <- ggplot(holiday_delays, aes(x = reorder(holiday_period, -percent_arr_delay))) +
   geom_col(aes(y = percent_arr_delay, fill = holiday_period == "Non-Holiday"), position = "dodge") +
   scale_y_continuous(labels = scales::percent_format()) +
@@ -621,46 +622,106 @@ ggplot(holiday_long, aes(x = holiday_period, y = percent, fill = delay_type)) +
 ```
 
 ```{r}
-holiday_dates_summary <- cleaned_weather_flights %>%
+holiday_model_data <- holiday_dates %>%
   mutate(
-    date = as.Date(time_hour),
-    holiday_period = case_when(
-      date %in% seq(as.Date("2013-01-01"), as.Date("2013-01-01"), by = "day") |
-      date %in% seq(as.Date("2013-05-25"), as.Date("2013-05-27"), by = "day") |
-      date %in% seq(as.Date("2013-07-04"), as.Date("2013-07-07"), by = "day")|
-      date %in% seq(as.Date("2013-11-28"), as.Date("2013-12-01"), by = "day") |
-      date %in% seq(as.Date("2013-12-24"), as.Date("2013-12-31"), by = "day") ~ "Holiday",
-      TRUE ~ "Non-Holiday"
-    )
+    holiday = ifelse(holiday_period == "Non-Holiday", 0, 1),
+    holiday_period = factor(holiday_period,
+                            levels = c("Non-Holiday", "New Year's",
+                                       "Memorial Day", "Independence Day",
+                                       "Thanksgiving", "Christmas/NYE"))
+  ) %>%
+  drop_na(dep_delay)
+
+m1 <- lm(dep_delay ~ holiday, data = holiday_model_data)
+
+# Main: specific holiday periods
+m2 <- lm(dep_delay ~ holiday_period, data = holiday_model_data)
+
+summary(m1)
+summary(m2)
+```
+
+
+```{r}
+model_metrics <- function(model, label) {
+  tibble(
+    Model  = label,
+    R2     = summary(model)$r.squared,
+    Adj_R2 = summary(model)$adj.r.squared,
+    RMSE   = sqrt(mean(residuals(model)^2)),
+    AIC    = AIC(model)
+  )
+}
+
+bind_rows(
+  model_metrics(m1, "M1: Binary Holiday"),
+  model_metrics(m2, "M2: Specific Holidays")
+)
+
+```
+
+
+
+```{r}
+library(caret)
+set.seed(42)
+cv_ctrl <- trainControl(method = "cv", number = 5)
+
+cv_m1 <- train(dep_delay ~ holiday,
+               data = holiday_model_data, method = "lm", trControl = cv_ctrl)
+
+cv_m2 <- train(dep_delay ~ holiday_period,
+               data = holiday_model_data, method = "lm", trControl = cv_ctrl)
+
+resamples(list(M1 = cv_m1, M2 = cv_m2)) %>% summary()
+```
+
+
+```{r}
+threshold <- 15
+
+eval_data <- holiday_model_data %>%
+  mutate(
+    actual_delayed    = dep_delay > threshold,
+    predicted_delayed = predict(m2, newdata = holiday_model_data) > threshold
   )
 
-holiday_delays <- holiday_dates_summary %>%
-  group_by(holiday_period) %>%
-  summarise(
-    total_flights = n(),
-    total_arr_delayed = sum(arr_delay > 15),
-    total_dep_delayed = sum(dep_delay > 15),
-    percent_arr_delay = total_arr_delayed / total_flights,
-    percent_dep_delay = total_dep_delayed / total_flights
-  ) %>%
-  arrange(desc(percent_dep_delay))
+conf_mat <- table(Predicted = eval_data$predicted_delayed,
+                  Actual    = eval_data$actual_delayed)
+print(conf_mat)
 
-holiday_long <- holiday_delays %>%
-  select(holiday_period, percent_arr_delay, percent_dep_delay) %>%
-  pivot_longer(cols = c(percent_arr_delay, percent_dep_delay),
-               names_to = "delay_type",
-               values_to = "percent") %>%
-  mutate(delay_type = recode(delay_type,
-                             "percent_arr_delay" = "Arrival Delay",
-                             "percent_dep_delay" = "Departure Delay"))
+# Safely extract with fallback to 0
+get_cell <- function(mat, row, col) {
+  if (row %in% rownames(mat) && col %in% colnames(mat)) mat[row, col] else 0
+}
 
-# Combined plot
-ggplot(holiday_long, aes(x = holiday_period, y = percent, fill = delay_type)) +
-  geom_col(position = "dodge") +
-  scale_y_continuous(labels = scales::percent_format()) +
-  labs(x = "Period",
-       y = "% of Flights Delayed",
-       fill = "Delay Type",
-       title = "Flight Delays: Holiday vs Non-Holiday") +
+TP <- get_cell(conf_mat, "TRUE",  "TRUE")
+TN <- get_cell(conf_mat, "FALSE", "FALSE")
+FP <- get_cell(conf_mat, "TRUE",  "FALSE")
+FN <- get_cell(conf_mat, "FALSE", "TRUE")
+
+cat(sprintf(
+  "Accuracy:  %.1f%%\nPrecision: %.1f%%\nRecall:    %.1f%%\nF1:        %.3f\n",
+  100 * (TP + TN) / sum(conf_mat),
+  100 * TP / (TP + FP),
+  100 * TP / (TP + FN),
+  2 * TP / (2 * TP + FP + FN)
+))
+```
+
+```{r}
+holiday_model_data %>%
+  mutate(predicted = predict(m2, newdata = holiday_model_data)) %>%
+  ggplot(aes(x = holiday_period)) +
+  geom_boxplot(aes(y = dep_delay,  fill = "Actual"),    alpha = 0.5) +
+  geom_boxplot(aes(y = predicted,  fill = "Predicted"), alpha = 0.5) +
+  scale_fill_manual(values = c("Actual" = "#619CFF", "Predicted" = "#F8766D")) +
+  labs(x = "Holiday Period", y = "Departure Delay (min)",
+       title = "Actual vs Predicted Delays by Holiday Period", fill = NULL) +
   theme_minimal() +
-  theme(plot.title = element_text(size = 10))
+  coord_flip()
+```
+
+
+
+```{r}
